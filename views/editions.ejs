@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<%- include ("partials/head") %>
+
+<body>
+  <%- include ("partials/navbar") %>
+
+  <div class="container-fluid pb-5 pt-5">
+    <div class="container">
+      <a href="<%= prevUrl; %>" type="button" class="btn btn-sm btn-light border"><i class="bi bi-arrow-left"></i></a>
+      <h1 class="h2 d-inline align-middle">Editions</h1>
+      <!-- alert -->
+      <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <span>You can edit only the editions of which you are the editor.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      <!-- list of editions -->
+      <% if (editions.length > 0) { %>
+      <ul>
+        <% editions.forEach(function(edition) { %>
+        <li class="p-2">
+          <span class="fw-bold"><%= edition.get("edition.title") %></span>, <span><%= edition.get("author.name") %></span> <span class="text-muted">curated by <%= edition.get("editor.name") %></span>
+          <a href="/edition/<%= edition.get('ID(edition)') %>-<%= edition.get('ID(editor)') %>" class="btn btn-primary btn-sm" title="Read the edition">Read the edition</a>
+          <% if (edition.get("editor.email") == email) { %>
+          <a href="/edit/<%= edition.get('ID(edition)') %>-<%= edition.get('ID(editor)') %>" class="btn btn-light btn-sm" title="Edit the edition">Edit the edition</a>
+          <% }; %>
+        </li>
+        <% }); %>
+      </ul>
+      <% } else { %>
+      <div>
+        <p>No edition is available for now.</p>
+        <a href="/apikey" class="btn btn-primary" title="Read the edition">Create an edition</a>
+      </div>
+      <% }; %>
+    </div>
+  </div>
+
+  <%- include ("partials/footer") %>
+  <%- include ("partials/script") %>
+</body>
+
+</html>

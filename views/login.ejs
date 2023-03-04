@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<%- include ("partials/head") %>
+
+<div class="text-center">
+  <div class="mb-3">
+    <img class="logo mb-3" src="/assets/img/logo-brand-shivadhama.png" alt="Logo Sivadharma">
+    <h1>Login</h1>
+  </div>
+
+  <% if (messages.error) { %>
+  <div class="alert alert-danger" role="alert">
+    <%= locals.messages.error %>
+  </div>
+  <% }; %>
+
+  <form class="login-form" action="/login" method="POST">
+    <div class="mb-2">
+      <label for="email">Email</label>
+      <input class="form-control" type="email" name="email" required>
+    </div>
+    <div class="mb-3">
+      <label for="password">Password</label>
+      <input class="form-control" type="password" name="password" required>
+    </div>
+    <div class="mb-3">
+      <button type="submit" class="btn btn-primary">Login</button>
+    </div>
+  </form>
+  <hr>
+  <span>Don't have an account yet?</span>
+  <a href="/register" title="Register">Register</a>
+</div>
+
+</html>

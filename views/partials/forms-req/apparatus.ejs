@@ -1,0 +1,286 @@
+  <!-- apparatus -->
+
+  <!-- witnesses -->
+  <% var witnessesArray = []; %>
+  <% witnesses.forEach((witness) => { %>
+    <% if (!witnessesArray.includes(witness["siglum"])) { %>
+      <% witnessesArray.push(witness["siglum"]); %>
+    <% }; %>
+  <% }); %>
+
+  <button type="button" class="btn-close float-end" aria-label="Close" data-bs-toggle="modal" data-bs-target="#cancel-apparatus" data-type="cancel-annotation"></button>
+  <h3 class="h6">Apparatus entry</h3>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#annotate-apparatus" type="button" role="tab" aria-controls="annotate" aria-selected="true">Annotate</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#check-apparatus" type="button" role="tab" aria-controls="check" aria-selected="false">Check all</button>
+    </li>
+    <!-- cancel -->
+    <!--<button type="button" class="btn btn-sm btn-pink" data-bs-toggle="modal" data-bs-target="#cancel-apparatus" data-type="cancel-annotation">
+      <i class="bi bi-eraser-fill"></i> Cancel
+    </button>
+    <div class="modal fade" id="cancel-apparatus" data-role="cancel-annotation" tabindex="-1" aria-labelledby="cancel-annotation" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Are you sure to cancel this annotation?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Please type <b>martinadellobuono</b> to confirm.</p>
+            <input type="text" class="form-control" data-role="safe-deletion">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" data-role="safe-deletion-btn" disabled>Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>-->
+  </ul>
+  <div class="tab-content">
+    <!-- ANNOTATE -->
+    <div class="tab-pane fade show active" id="annotate-apparatus" role="tabpanel" aria-labelledby="annotate-tab">
+      <!-- error handling -->
+      <% if (typeof errors !== "undefined") { %>
+      <% if (errors.length == 0) { %>
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <p>Data saved!</p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      <% } else { %>
+      <% errors.forEach((error) => { %>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <p>Please insert the <strong><%= error.msg %></strong>.</p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      <% }); %>
+      <% }; %>
+      <% }; %>
+      <!-- apparatus form -->
+      <div class="annotation-form apparatus d-none apparatus-scroll scroll-tab">
+        <form class="form-annotations" id="apparatus-req" method="post" action="/addApparatus/<%= id %>">
+          <!-- ID -->
+          <div class="d-none">
+            <label class="form-label">ID of annotation</label>
+            <input class="form-control cursor-not-allowed root-id-input" type="text" aria-describedby="ID of annotation" readonly="true" data-value="apparatus" name="idAnnotation">
+          </div>
+          <!-- selected fragment -->
+          <div class="mb-3 mt-3">
+            <label class="form-label">Selected fragment</label>
+            <input class="form-control" type="text" aria-describedby="Selected fragment" readonly="true" data-value="apparatus" name="selectedFragment">
+          </div>
+          <!-- location -->
+          <div class="bg-white p-3 mb-3">
+            <!-- chapter -->
+            <div class="mb-3">
+              <label class="form-label">Chapter</label>
+              <input class="form-control" type="number" aria-describedby="Chapter" placeholder="Insert the number of chapter" name="chapter" required>
+            </div>
+            <!-- stanza / pada -->
+            <label class="form-label">Stanza</label>
+            <div class="mb-3">
+              <div class="form-text">If you refer to only one stanza, fill the starting stanza and pāda&#x28;s&#x29; form, then the ending stanza and pāda&#x28;s&#x29; with the values of the starting ones.</div>
+            </div>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Starting stanza</span>
+              <input type="number" min="1" class="form-control live-check" placeholder="Insert stanza" aria-describedby="Insert stanza" name="stanzaStart" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Pāda</label>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input live-check" type="checkbox" value="a" name="padaStart">
+                <label class="form-check-label">a</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input live-check" type="checkbox" value="b" name="padaStart">
+                <label class="form-check-label">b</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input live-check" type="checkbox" value="c" name="padaStart">
+                <label class="form-check-label">c</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input live-check" type="checkbox" value="d" name="padaStart">
+                <label class="form-check-label">d</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input live-check" type="checkbox" value="e" name="padaStart">
+                <label class="form-check-label">e</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input live-check" type="checkbox" value="f" name="padaStart">
+                <label class="form-check-label">f</label>
+              </div>
+            </div>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Ending stanza</span>
+              <input type="number" min="1" class="form-control live-check" placeholder="Insert stanza" aria-describedby="Insert stanza" name="stanzaEnd" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Pāda</label>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input live-check" type="checkbox" value="a" name="padaEnd">
+                <label class="form-check-label">a</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input live-check" type="checkbox" value="b" name="padaEnd">
+                <label class="form-check-label">b</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input live-check" type="checkbox" value="c" name="padaEnd">
+                <label class="form-check-label">c</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input live-check" type="checkbox" value="d" name="padaEnd">
+                <label class="form-check-label">d</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input live-check" type="checkbox" value="e" name="padaEnd">
+                <label class="form-check-label">e</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input live-check" type="checkbox" value="f" name="padaEnd">
+                <label class="form-check-label">f</label>
+              </div>
+            </div>
+          </div>
+          <!-- lemma -->
+          <div class="bg-white p-3 mb-3">
+            <label class="form-label">Lemma</label>
+            <!-- present or omitted -->
+            <div class="mb-3">
+              <div class="form-check">
+                <input class="form-check-input check-presence" type="radio" data-subtype="lemma" data-value="lemma-present" data-omission="lemma" name="lemmaPresence" checked>
+                <label class="form-check-label">Present</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input check-presence" type="radio" data-subtype="lemma" data-value="lemma-omission" data-href="lemmaOmission" data-omission="lemma" name="lemmaPresence">
+                <label class="form-check-label">Omitted</label>
+              </div>
+            </div>
+            <!-- truncation -->
+            <div class="p-3 pb-1 bg-light" data-subtype="lemma" data-workflow="lemma-present">
+              <div class="mb-3">
+                <div class="mb-2">
+                  <span class="fs-6 text-secondary">Truncation</span>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" data-subtype="truncation" data-href="lemma" data-value="circlefront" value="circlefront" name="lemmaTruncation">
+                  <label class="form-check-label">Circlefront</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" data-subtype="truncation" data-href="lemma" data-value="circleback" value="circleback" name="lemmaTruncation">
+                  <label class="form-check-label">Circleback</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" data-subtype="truncation" data-href="lemma" data-value="circlearound" value="circlearound" name="lemmaTruncation">
+                  <label class="form-check-label">Circlearound</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" data-subtype="truncation" data-href="lemma" data-value="notruncation" value="notruncation" name="lemmaTruncation" checked>
+                  <label class="form-check-label">No truncation</label>
+                </div>
+                <!-- lemma -->
+                <input class="form-control live-check mb-0 mt-3" type="text" data-subtype="truncation" placeholder="Insert lemma" aria-describedby="Insert lemma" name="lemma">
+                <!-- lemma id -->
+                <input class="d-none form-control cursor-not-allowed id-input" type="text" data-subtype="id-lemma" aria-describedby="ID of lemma" readonly="true" data-value="apparatus" name="idLemma">
+              </div>
+            </div>
+            <!-- witnesses -->
+            <div class="p-3 bg-light">
+              <label class="form-label">Witness&#x28;es&#x29;</label>
+              <input class="form-control live-check" id="witsLemma" data-list="<%= JSON.stringify(witnessesArray); %>" data-type="witness" type="search" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off" maxlength="2048" name="manuscriptLemma">
+              <div class="form-text">Separate the values by using &#x22; &#x3b; &#x22;.</div>
+            </div>
+            <!-- additional notes -->
+            <div class="p-3 bg-light">
+              <label class="form-label">Additional notes</label>
+              <div class="apparatus-container">
+                <textarea class="mt-1 live-check" placeholder="Insert additional notes..." data-type="apparatus" data-subtype="omissionComment" name="lemmaNotes" id="lemmaNotes"></textarea>
+              </div>
+            </div>
+          </div>
+          <!-- variants -->
+          <div class="alert alert-primary alert-dismissible fade show p-3 mb-3 data-list" data-cloned="variant">
+            <label class="form-label">Variant</label>
+            <!-- present or omitted -->
+            <div class="mb-3">
+              <div class="form-check">
+                <input class="form-check-input check-presence" type="radio" data-subtype="variant0-presence" data-value="variant0-present" name="variant0-presence" checked>
+                <label class="form-check-label">Present</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input check-presence" type="radio" data-subtype="variant0-presence" data-value="variant0-omission" data-href="variant0-omission" data-omission="variant0" name="variant0-presence">
+                <label class="form-check-label">Omitted</label>
+              </div>
+            </div>
+            <!-- truncation -->
+            <div class="p-3 pb-1 bg-light" data-subtype="variant0" data-workflow="variant0-present">
+              <div class="mb-3">
+                <div class="mb-2">
+                  <span class="fs-6 text-secondary">Truncation</span>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" data-subtype="truncation" data-href="variant0" data-value="circlefront" name="truncation-radios">
+                  <label class="form-check-label">Circlefront</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" data-subtype="truncation" data-href="variant0" data-value="circleback" name="truncation-radios">
+                  <label class="form-check-label">Circleback</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" data-subtype="truncation" data-href="variant0" data-value="circlearound" name="truncation-radios">
+                  <label class="form-check-label">Circlearound</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" data-subtype="truncation" data-href="variant0" data-value="notruncation" name="truncation-radios" checked>
+                  <label class="form-check-label">No truncation</label>
+                </div>
+                <!-- variant -->
+                <input class="form-control live-check mb-0 mt-3" type="text" data-subtype="variant" placeholder="Insert variant" aria-describedby="Insert variant" name="variant0">
+                <!-- variant id -->
+                <input class="d-none form-control cursor-not-allowed id-input" type="text" data-subtype="id-variant" aria-describedby="ID of variant" readonly="true" data-value="variant" name="idVariant0">
+              </div>
+            </div>
+            <!-- witnesses -->
+            <div class="p-3 bg-light">
+              <label class="form-label">Witness&#x28;es&#x29;</label>
+              <!-- witnesses -->
+              <input class="form-control live-check" id="witsVariant" data-list="<%= JSON.stringify(witnessesArray); %>" data-type="witness" type="search" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off" maxlength="2048" name="manuscriptVariant0">
+              <div class="form-text">Separate the values by using &#x22; &#x3b; &#x22;.</div>
+            </div>
+            <!-- additional notes -->
+            <div class="p-3 bg-light">
+              <label class="form-label">Additional notes</label>
+              <div class="apparatus-container">
+                <textarea class="live-check mt-1" placeholder="Insert additional notes..." data-type="apparatus" data-subtype="omissionComment" name="variant0Omission" id="variant0-OmissionEditor"></textarea>
+              </div>
+            </div>
+          </div>
+          <div id="variant">
+          </div>
+          <!-- add variant -->
+          <div class="mb-3">
+            <button type="button" class="btn btn-primary" data-clone="variant">&#x2b;</button>
+          </div>
+          <!-- submit -->
+          <div>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+      <!-- live check apparatus -->
+      <%- include ("partials/forms-live-check/apparatus") %>
+    </div>
+    <!-- CHECK -->
+    <div class="tab-pane fade" id="check-apparatus" role="tabpanel" aria-labelledby="check-tab">
+      <h2 class="mt-3 h5" id="check-annotation"></h2>
+      <!-- results apparatus -->
+      <div class="apparatus-scroll scroll-tab" id="apparatus-res">
+        <%- include ("partials/forms-res/apparatus") %>
+      </div>
+    </div>
+  </div>

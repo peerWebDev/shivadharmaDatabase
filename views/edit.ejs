@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<%- include ("partials/head") %>
+
+<body onload="onloadEdit()">
+  <%- include ("partials/navbar") %>
+  <!-- header -->
+  <div class="container-fluid bg-light p-2">
+    <div class="row">
+      <!-- title -->
+      <div class="col-md-8">
+        <a href="<%= prevUrl; %>" type="button" class="btn btn-sm btn-light border"><i class="bi bi-arrow-left"></i></a>
+        <h1 class="h4 d-inline">
+          <% if (title) { %>
+            <span data-type="header" data-subtype="title"><%= title; %></span><span data-type="separator" data-subtype="coma">, </span>
+          <% }; %>
+          <% if (authors) { %>
+            <% authors.forEach((author) => { %>
+              <span data-type="header" data-subtype="author"><%= author; %></span>
+            <% }); %>
+          <% }; %>
+        </h1>
+        <h2 class="d-inline h5 text-secondary">
+          <span data-type="header" data-subtype="curated-by">Curated by </span>
+          <% if (editors) { %>
+            <% editors.forEach((editor) => { %>
+              <span data-type="header" data-subtype="editor"><%= editor %></span>
+            <% }); %>
+          <% }; %>
+        </h2>
+      </div>
+      <div class="col-md-4 text-end">
+        <!-- metadata -->
+        <%- include ("partials/metadata") %>
+        <!-- publish -->
+        <button type="submit" class="btn btn-primary" form="base-text">Publish</button>
+        <!-- save as draft -->
+        <button type="button" class="btn btn-light border">Save as draft</button>
+      </div>
+    </div>
+  </div>
+  <!-- edition -->
+  <div class="container-fluid bg-white edition-container">
+    <div class="row">
+      <!-- textus constitutus -->
+      <div class="col-md-6 border p-3 enlarge-col">
+        <h3 class="h6">Textus constitutus</h3>
+        <form method="post" action="/addFile/<%= id %>" enctype="multipart/form-data">
+          <label class="text-muted">Upload a <span class="fw-bold">.docx</span> or <span class="fw-bold">.txt</span> file:</label>
+          <input type="file" name="upload">
+          <input class="btn btn-sm btn-light border" type="submit" value="Submit">
+        </form>
+        <!-- file -->
+        <form class="file-container" id="base-text" method="post" action="/publish/<%= id %>">
+          <!-- check modifications -->
+          <div class="modal fade" id="check-modifications" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content border border-2 border-warning">
+                <div class="modal-header">
+                  <h5 class="modal-title">You are going to edit an annotated fragment. </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <p>What would you like to do?</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                  <button type="button" class="btn btn-primary" data-role="modify-annotation">Modify the fragment</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <textarea class="mt-1" id="fileBaseTxt" placeholder="Insert the text of your edition..." data-url-param="<%= id %>" name="fileBaseTxt">
+            <% if (file) { %>
+                <%- include (`../uploads/${file}`) %>
+            <% }; %>
+          </textarea>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <span class="text-success d-none" id="fragment-message">All changes to the annotated fragment saved.</span>
+            <span class="text-secondary d-none" id="autosaved-message">All changes saved.</span>
+          </div>
+        </form>
+      </div>
+      <!-- annotations -->
+      <div class="annotations-box-below specific-cols col-md-2 bg-light border p-3">
+        <div class="row">
+          <!-- forms -->
+          <div class="col-md-12">
+            <!-- default settings -->
+            <div class="default-settings">
+              <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#annotate" type="button" role="tab" aria-controls="annotate" aria-selected="true">Annotate</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#check" type="button" role="tab" aria-controls="check" aria-selected="false">Check all</button>
+                </li>
+              </ul>
+              <div class="tab-content scroll-tab">
+                <div class="tab-pane fade show active" id="annotate" role="tabpanel" aria-labelledby="annotate-tab">
+                  <!-- default alerts -->
+                  <div id="annotation-warning"></div>
+                  <div class="alert alert-primary alert-dismissible fade show mt-3" role="alert">
+                    <p class="fw-bold">How the annotator works</p>
+                    <p class="fw-bolder mb-2">1. Insert the witnesses</p>
+                    <p>Click on Add metadata button, then on Witnesses. Insert all the witnesses to use them later building the apparatus. You can modify any metadata later.</p>
+                    <p class="fw-bolder mb-2">2. Insert the annotations</p>
+                    <p>Highlight the fragment in the text you would like to annotate, then click a button to add specific information. Finally, fill in the forms which will appear after clicking the button.</p>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="check" role="tabpanel" aria-labelledby="check-tab">
+                  <h2 class="mt-3 h5" id="check-annotation"></h2>
+                  <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <p class="fw-bold">How the annotator works<br><span class="fw-bolder">Check the annotations</span></p>
+                    <p>After annotating the selected fragment in the text, click on Check all to check the specific information you added via forms and modify them, if needed.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- apparatus form -->
+            <div class="annotation-form apparatus d-none">
+              <%- include ("partials/forms-req/apparatus") %>
+            </div>
+            <!-- notes form -->
+            <div class="annotation-form note d-none">
+              <%- include ("partials/forms-req/note") %>
+            </div>
+            <!-- text structure form -->
+            <div class="annotation-form textStructure d-none">
+              <%- include ("partials/forms-req/textStructure") %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- translation -->
+      <div class="col-md-1 border p-3 enlarge-col specific-cols">
+        <button type="button" class="btn-close float-end d-none" aria-label="Close" data-bs-toggle="modal" data-bs-target="#cancel-annotation" data-type="cancel-annotation"></button>
+        <h3 class="h6">Translation</h3>
+        <div class="btn-group-vertical btn-vertical">
+          <button type="button" class="btn btn-sm btn-preview btn-teal" data-value="translation" title="Insert/check translations"><i class="bi bi-eye-fill"></i></button>
+          <button type="button" class="btn btn-sm btn-annotation btn-teal mb-2" data-value="translation" title="Insert/check translations"><i class="bi bi-pencil-fill"></i></button>
+        </div>
+        <div class="annotation-form translation d-none">
+          <%- include ("partials/forms-req/translation") %>
+        </div>
+      </div>
+      <!-- parallels -->
+      <div class="col-md-1 border p-3 enlarge-col specific-cols">
+        <button type="button" class="btn-close float-end d-none" aria-label="Close" data-bs-toggle="modal" data-bs-target="#cancel-annotation" data-type="cancel-annotation"></button>
+        <h3 class="h6">Parallels</h3>
+        <div class="btn-group-vertical btn-vertical">
+          <button type="button" class="btn btn-sm btn-preview btn-orange" data-value="parallel" title="Preview parallels"><i class="bi bi-eye-fill"></i></button>
+          <button type="button" class="btn btn-sm btn-orange btn-annotation mb-2" data-value="parallel" title="Insert/check parallels"><i class="bi bi-pencil-fill"></i></button>
+        </div>
+        <div class="annotation-form parallel d-none">
+          <%- include ("partials/forms-req/parallel") %>
+        </div>
+      </div>
+      <!-- commentary -->
+      <div class="col-md-1 border p-3 enlarge-col specific-cols">
+        <button type="button" class="btn-close float-end d-none" aria-label="Close" data-bs-toggle="modal" data-bs-target="#cancel-annotation" data-type="cancel-annotation"></button>
+        <h3 class="h6">Commentary</h3>
+        <div class="btn-group-vertical btn-vertical">
+          <button type="button" class="btn btn-sm btn-preview btn-indigo" data-value="commentary" title="Preview commentary"><i class="bi bi-eye-fill"></i></button>
+          <button type="button" class="btn btn-sm btn-indigo btn-annotation mb-2" data-value="commentary" title="Insert/check commentary"><i class="bi bi-pencil-fill"></i></button>
+        </div>
+        <div class="annotation-form commentary d-none">
+          <%- include ("partials/forms-req/commentary") %>
+        </div>
+      </div>
+      <!-- citations -->
+      <div class="col-md-1 border p-3 enlarge-col specific-cols">
+        <button type="button" class="btn-close float-end d-none" aria-label="Close" data-bs-toggle="modal" data-bs-target="#cancel-annotation" data-type="cancel-annotation"></button>
+        <h3 class="h6">Citations</h3>
+        <div class="btn-group-vertical btn-vertical">
+          <button type="button" class="btn btn-sm btn-preview btn-fuchsia" data-value="citation" title="Preview citations"><i class="bi bi-eye-fill"></i></button>
+          <button type="button" class="btn btn-sm btn-fuchsia btn-annotation mb-2" data-value="citation" title="Insert/check citations"><i class="bi bi-pencil-fill"></i></button>
+        </div>
+        <div class="annotation-form citation d-none">
+          <%- include ("partials/forms-req/citation") %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- annotation buttons -->
+  <div class="container-fluid bg-light p-2">
+    <div class="row">
+      <div class="col-md-12">
+        <span>Insert/check: </span>
+        <!-- text structure -->
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-sm btn-preview btn-secondary" data-value="textStructure" title="Preview text structure"><i class="bi bi-eye-fill"></i></button>
+          <button type="button" class="btn btn-sm btn-annotation btn-secondary" data-value="textStructure" title="Insert/check text structure"><i class="bi bi-pencil-fill"></i> Text structure</button>
+        </div>
+        <!-- apparatus entry -->
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-sm btn-preview btn-yellow" data-value="apparatus" title="Preview apparatus"><i class="bi bi-eye-fill"></i></button>
+          <button type="button" class="btn btn-sm btn-annotation btn-yellow" data-value="apparatus" title="Insert/check text structure"><i class="bi bi-pencil-fill"></i> Apparatus entry</button>
+        </div>
+        <!-- note -->
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-sm btn-preview btn-blue" data-value="note" title="Preview notes"><i class="bi bi-eye-fill"></i></button>
+          <button type="button" class="btn btn-sm btn-annotation btn-blue" data-value="note" title="Insert/check notes"><i class="bi bi-pencil-fill"></i> Note on the text</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- check annotation modal -->
+  <div class="modal fade" id="cancel-annotation" data-role="cancel-annotation" tabindex="-1" aria-labelledby="cancel-annotation" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Are you sure to cancel this annotation?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Please type <b>martinadellobuono</b> to confirm.</p>
+          <input type="text" class="form-control" data-role="safe-deletion">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" data-role="safe-deletion-btn" disabled>Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%- include ("partials/script") %>
+</body>
+
+</html>

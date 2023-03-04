@@ -1,0 +1,361 @@
+@import "../../node_modules/bootstrap/scss/bootstrap.scss";
+
+/* html */
+html {
+    scroll-behavior: $enable-smooth-scroll;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* body */
+body {
+    padding-top: 56px;
+}
+
+/* white space */
+.nowrap {
+    white-space: nowrap;
+}
+
+/* background */
+.bg-blue {
+    background-color: $cyan-100;
+}
+
+.bg-fuchsia {
+    background-color: $pink-200;
+}
+
+.bg-indigo {
+    background-color: $indigo-200;
+}
+
+.bg-orange {
+    background-color: $orange-300;
+}
+
+.bg-teal {
+    background-color: $teal-200;
+}
+
+.bg-yellow {
+    background-color: $yellow;
+}
+
+/* buttons */
+.btn-blue {
+    background-color: $cyan-700;
+    color: $light;
+}
+
+.btn-fuchsia {
+    background-color: $pink-400;
+    color: $light;
+}
+
+.btn-orange {
+    background-color: $orange-400;
+    color: $light;
+}
+
+.btn-indigo {
+    background-color: $indigo-400;
+    color: $light;
+}
+
+.btn-pink {
+    background-color: $red-200;
+    color: $light;
+}
+
+.btn-teal {
+    background-color: $teal-400;
+    color: $light;
+}
+
+.btn-yellow {
+    background-color: $yellow-400;
+    color: $dark;
+}
+
+/* btn hover */
+.btn-blue:hover {
+    background-color: $cyan-600;
+    color: $light;
+}
+
+.btn-fuchsia:hover {
+    background-color: $pink-300;
+    color: $light;
+}
+
+.btn-orange:hover {
+    background-color: $orange;
+    color: $light;
+}
+
+.btn-indigo:hover {
+    background-color: $indigo;
+    color: $light;
+}
+
+.btn-pink:hover {
+    background-color: $red-300;
+    color: $light;
+}
+
+.btn-teal:hover {
+    background-color: $teal-300;
+    color: $light;
+}
+
+.btn-yellow:hover {
+    background-color: $yellow-300;
+}
+
+/* btn captions */
+.btn-commentary::after {
+    content: "\25CF  Comment";
+    color: $indigo-200;
+    font-size: 12px;
+    vertical-align: top;
+}
+
+.btn-note::after {
+    content: "\25CF  Note";
+    color: $cyan-600;
+    font-size: 12px;
+    vertical-align: top;
+}
+
+.btn-translation::after {
+    content: "\25CF  Translation";
+    color: $yellow;
+    font-size: 12px;
+    vertical-align: top;
+}
+
+/* titles */
+.title-subsection:hover {
+    color: $gray-800;
+}
+
+/* caret */
+.caret[aria-expanded="false"]::after {
+    content: "\25BC";
+    font-size: 10px;
+}
+
+.caret[aria-expanded="true"]::after {
+    content: "\25B2";
+    font-size: 10px;
+}
+
+/* cursor */
+.cursor-not-allowed:hover {
+    cursor: not-allowed;
+}
+
+/* display */
+.inline-children>span {
+    display: inline;
+}
+
+/* layout */
+/* paragraphs */
+p {
+    margin-bottom: 10px !important;
+}
+
+.note p {
+    display: inline;
+}
+
+/* cols */
+.specific-cols.col-md-1 {
+    width: 3% !important;
+}
+
+.specific-cols.col-md-2 {
+    width: 38% !important;
+}
+
+.specific-cols.col-md-4 {
+    width: 38% !important;
+}
+
+.specific-cols.col-md-1 h3 {
+    transform: rotate(90deg);
+}
+
+.specific-cols.col-md-1 .btn-vertical {
+    margin-left: -10px;
+    margin-top: 100px;
+    width: fit-content;
+}
+
+/* forms */
+.login-form input {
+    display: inline;
+    width: initial;
+}
+
+/* links */
+.link-light {
+    color: $light;
+    text-decoration: none;
+}
+
+.link-light:hover {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+/* edit */
+.edition-container,
+.edition-container .row {
+    height: 80vh;
+}
+
+.edition-container>.row>div {
+    height: -webkit-fill-available;
+    overflow: hidden;
+}
+
+/* read */
+.edition-container-vis,
+.edition-container-vis .row {
+    height: 80vh;
+}
+
+.edition-container-vis>.row>div {
+    height: -webkit-fill-available;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+/* tabs */
+.scroll-tab {
+    height: 60vh;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.scroll-tab::-webkit-scrollbar {
+    width: 10px;
+}
+
+.scroll-tab::-webkit-scrollbar-track {
+    background: $light;
+}
+
+.scroll-tab::-webkit-scrollbar-thumb {
+    background-color: $secondary;
+    border-radius: 10px;
+}
+
+/* autocomplete */
+[role="listbox"] {
+    border: 1px solid $light;
+    list-style: none;
+    padding: $spacer;
+}
+
+/* live check */
+.live-check-container {
+    height: 5vh;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.live-check-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.live-check-container::-webkit-scrollbar-track {
+    background: $light;
+}
+
+.live-check-container::-webkit-scrollbar-thumb {
+    background-color: $secondary;
+    border-radius: 10px;
+}
+
+.live-omission-note p {
+    display: inline;
+}
+
+/* check modifications */
+#check-modifications .modal-content:after {
+    position: absolute;
+    z-index: -1;
+    content: "";
+    left: -17px;
+    bottom: calc(50% - 10px);
+    border-style: solid;
+    border-width: 0 10px 10px 10px;
+    border-color: transparent transparent #FFC107 transparent;
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+    -webkit-transition-property: -webkit-transform;
+    transition-property: -webkit-transform;
+    transition-property: transform;
+    transition-property: transform, -webkit-transform;
+    rotate: 270deg;
+}
+
+/* account */
+.account-sidebar li {
+    padding: 0;
+}
+
+.account-sidebar a.active {
+    background-color: $light;
+    color: $dark;
+}
+
+.account-sidebar a:not(.active) {
+    color: $light;
+}
+
+.account-sidebar a:hover:not(.active) {
+    background-color: $light;
+    color: $dark;
+}
+
+/* logo */
+.logo {
+    width: 5%;
+    height: auto;
+}
+
+/* expand section */
+.expand-section {
+    font-size: 12px;
+}
+
+.expand-section[aria-expanded="false"]::after {
+    content: "\25BC";
+}
+
+.expand-section[aria-expanded="true"]::after {
+    content: "\25B2";
+}
+
+/* help symbol */
+.help-symbol {
+    color: $secondary;
+}
+
+.help-symbol:hover {
+    color: $gray-700;
+}
+
+/* automatically save */
+.autosaved-message--success {
+    color: $success;
+    font-size: 15px;
+}
+
+.autosaved-message--saving {
+    color: $secondary;
+    font-size: 15px;
+}
