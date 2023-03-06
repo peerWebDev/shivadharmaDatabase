@@ -56,15 +56,15 @@ router.get("/account", async (req, res) => {
                     `
                     MATCH (edition:Edition)-[e:EDITED_BY]->(editor:Editor)
                     WHERE editor.name = "${user}"
-                    RETURN edition.title, id(edition), id(editor)
+                    RETURN edition.publishType, edition.title, id(edition), id(editor)
                     ORDER BY edition.title
                     `
                 )
                 .subscribe({
                     onNext: record => {
                         /* editions */
-                        if (!editions.includes(record.get("edition.title") + "___" + record.get("id(edition)"))) {
-                            editions.push(record.get("edition.title") + "___" + record.get("id(edition)"));
+                        if (!editions.includes(record.get("edition.title") + "___" + record.get("id(edition)") + "---" + record.get("edition.publishType"))) {
+                            editions.push(record.get("edition.title") + "___" + record.get("id(edition)") + "---" + record.get("edition.publishType"));
                         };
                         /* editor id */
                         idEditor = record.get("id(editor)");
@@ -72,7 +72,7 @@ router.get("/account", async (req, res) => {
                 })
             );
         } catch (err) {
-            console.log("Error related to the upload of the editions: " + err);
+            console.log(err);
         } finally {
             await session.close();
         };

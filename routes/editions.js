@@ -48,7 +48,7 @@ router.get("/editions", async (req, res) => {
                 .run(
                     `
                     MATCH (author:Author)<-[w:WRITTEN_BY]-(work:Work)-[h:HAS_MANIFESTATION]->(edition:Edition)-[e:EDITED_BY]->(editor:Editor)
-                    RETURN author.name, edition.title, editor.name, ID(edition), ID(editor), editor.email
+                    RETURN author.name, edition.publishType, edition.title, editor.name, ID(edition), ID(editor), editor.email
                     ORDER BY edition.title, author.name, editor.name
                     `
                 )
