@@ -339,10 +339,13 @@ app.use("/", addCitation);
 const addNote = require("./routes/forms/note/addNote");
 app.use("/", addNote);
 
-/* TRY */
 /* save file */
 const saveFile = require("./routes/saveFile");
 app.use("/", saveFile);
+
+/* add philological note */
+const addPhilologicalNote  = require("./routes/forms/metadata/addPhilologicalNote");
+app.use("/", addPhilologicalNote);
 
 /* publish */
 const publish = require("./routes/publish");

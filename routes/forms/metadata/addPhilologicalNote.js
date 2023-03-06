@@ -1,0 +1,66 @@
+const express = require("express");
+const path = require("path");
+const formidable = require("formidable");
+const bodyParser = require("body-parser");
+const mammoth = require("mammoth");
+const fs = require("fs");
+const neo4j = require("neo4j-driver");
+const driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic("neo4j", "shivadharma_temp_editions"));
+const router = express.Router();
+router.use(bodyParser.json());
+router.use(bodyParser.urlencoded({ extended: false }));
+
+router.post("/addPhilologicalNote/:id", async (req, res) => {
+    var idEdition = req.params.id.split("/").pop().split("-")[0];
+    var idEditor = req.params.id.split("/").pop().split("-")[1];
+    var path = `${__dirname}/../../../uploads/philologicalNote/note-${idEdition}-${idEditor}.html`;
+    try {
+        fs.writeFile(path, req.body.philologicalNote, "utf8", (err) => {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("The philological note has been overwritten");
+            };
+        });
+    } catch (error) {
+        console.log(error);
+    } finally {
+        /* put in the database and visualize it in the editor */
+        var philologicalNote = `note-${idEdition}-${idEditor}.html`
+        const session = driver.session();
+        try {
+            try {
+                await session.writeTransaction(tx => tx
+                    .run(
+                        `
+                            MATCH (author:Author)<-[:WRITTEN_BY]-(work:Work)-[:HAS_MANIFESTATION]->(edition:Edition)-[:EDITED_BY]->(editor:Editor)
+                            WHERE id(edition) = ${idEdition} AND id(editor) = ${idEditor}
+                            MERGE (philologicalNote:PhilologicalNote {name: $philologicalNote})
+                            MERGE (philologicalNote)-[:PRODUCED_BY]->(editor)
+                            MERGE (philologicalNote)<-[:IS_DOCUMENTED_IN]-(edition)
+                            RETURN *
+                            `, { philologicalNote: philologicalNote }
+                    )
+                    .subscribe({
+                        onCompleted: () => {
+                            console.log("Data added to the database");
+                        },
+                        onError: err => {
+                            console.log(err);
+                        }
+                    })
+                );
+            } catch (err) {
+                console.log(err);
+            } finally {
+                await session.close();
+            };
+        } catch (err) {
+            console.log(err);
+        } finally {
+            res.redirect("/edit/" + idEdition + "-" + idEditor);
+        };
+    };
+});
+
+module.exports = router;

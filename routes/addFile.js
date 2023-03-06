@@ -29,21 +29,21 @@ router.post("/addFile/:id", async (req, res) => {
                         fs.access(file.path, fs.F_OK, () => {
                             fs.writeFile(file.path, result.value, "utf8", (err) => {
                                 if (err) {
-                                    console.log("Error related to rewriting the file: " + err);
+                                    console.log(err);
                                 } else {
                                     console.log("The file has been overwritten");
                                 };
                             });
                             fs.rename(file.path, url, (err) => {
                                 if (err) {
-                                    console.log("Error related to renaming the file: " + err);
+                                    console.log(err);
                                 } else {
                                     console.log("The file has been renamed: " + `${idEdition}-${idEditor}.html`);
                                 };
                             });
                         });
                     } catch (error) {
-                        console.log("Error in converting the file: " + error);
+                        console.log(error);
                     };
                 })
                 .done(async () => {
@@ -69,12 +69,12 @@ router.post("/addFile/:id", async (req, res) => {
                                         console.log("Data added to the database");
                                     },
                                     onError: err => {
-                                        console.log("Error related to Neo4j action /addFile/:id: " + err);
+                                        console.log(err);
                                     }
                                 })
                             );
                         } catch (err) {
-                            console.log("Error related to Neo4j: " + err);
+                            console.log(err);
                         } finally {
                             await session.close();
                         };
@@ -87,9 +87,9 @@ router.post("/addFile/:id", async (req, res) => {
         } else {
             fs.rename(file.path, url, (err) => {
                 if (err) {
-                    console.log("Error related to renaming the file: " + err);
+                    console.log(err);
                 } else {
-                    console.log("The file has been renamed: " + file.name);
+                    console.log(file.name);
                 };
             });
         };

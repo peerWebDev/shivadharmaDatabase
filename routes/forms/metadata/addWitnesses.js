@@ -158,8 +158,8 @@ router.post("/addWitnesses/:id", async (req, res) => {
     } catch (err) {
         console.log(err);
     } finally {
-        res.redirect(`../edit/${idEdition}-${idEditor}`);
         await session.close();
+        res.redirect(`../edit/${idEdition}-${idEditor}`);
     };
 });
 
