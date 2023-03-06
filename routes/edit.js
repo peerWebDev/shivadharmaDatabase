@@ -47,6 +47,8 @@ router.get("/edit/:id", async (req, res) => {
     /* data of the edition */
     var file = `${idEdition}-${idEditor}.html`;
     var path = `${__dirname}/../uploads/${idEdition}-${idEditor}.html`;
+    var philologicalNote = `note-${idEdition}-${idEditor}.html`;
+    var phPath = `${__dirname}/../uploads/philologicalNote/note-${idEdition}-${idEditor}.html`;
     var workMatrix;
     var title;
     var editionOf;
@@ -569,52 +571,45 @@ router.get("/edit/:id", async (req, res) => {
                     });
 
                     /* page rendering */
+                    /* file textus */
+                    var textus;
                     if (fs.existsSync(path)) {
-                        res.render("edit", {
-                            prevUrl: prevUrl,
-                            id: req.params.id,
-                            name: req.user.name,
-                            work: workMatrix,
-                            title: title,
-                            editionOf: editionOf,
-                            authors: authors,
-                            authorCommentary: authorCommentary,
-                            date: date,
-                            editors: editors,
-                            file: file,
-                            chapter: chapter,
-                            translation: translation,
-                            commentary: commentary,
-                            parallels: parallels,
-                            citations: citations,
-                            notes: notes,
-                            witnesses: witnesses,
-                            apparatus: apparatus
-                        });
+                        textus = file;
                     } else {
-                        res.render("edit", {
-                            prevUrl: prevUrl,
-                            id: req.params.id,
-                            name: req.user.name,
-                            work: workMatrix,
-                            title: title,
-                            editionOf: editionOf,
-                            authors: authors,
-                            authorCommentary: authorCommentary,
-                            date: date,
-                            editors: editors,
-                            file: false,
-                            chapter: chapter,
-                            translation: translation,
-                            commentary: commentary,
-                            parallels: parallels,
-                            citations: citations,
-                            notes: notes,
-                            witnesses: witnesses,
-                            apparatus: apparatus
-                        });
+                        textus = false
                     };
 
+                    /* file philological note */
+                    var phNote;
+                    if (fs.existsSync(phPath)) {
+                        phNote = philologicalNote;
+                    } else {
+                        phNote = false
+                    };
+
+                    /* rendering */
+                    res.render("edit", {
+                        prevUrl: prevUrl,
+                        id: req.params.id,
+                        name: req.user.name,
+                        work: workMatrix,
+                        title: title,
+                        editionOf: editionOf,
+                        authors: authors,
+                        authorCommentary: authorCommentary,
+                        date: date,
+                        editors: editors,
+                        file: textus,
+                        philologicalNote: phNote,
+                        chapter: chapter,
+                        translation: translation,
+                        commentary: commentary,
+                        parallels: parallels,
+                        citations: citations,
+                        notes: notes,
+                        witnesses: witnesses,
+                        apparatus: apparatus
+                    });
                 },
                 onError: err => {
                     console.log("Error related to the upload to Neo4j: " + err)
