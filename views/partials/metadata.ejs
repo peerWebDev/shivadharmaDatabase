@@ -543,7 +543,7 @@
             <form method="post" action="/addPhilologicalNote/<%= id %>">
               <div class="metadata-container">
                 <textarea class="mt-1" placeholder="Insert the philological note of your edition..." name="philologicalNote">
-                <% if (file) { %>
+                <% if (philologicalNote) { %>
                   <%- include (`../uploads/philologicalNote/${philologicalNote}`) %>
                 <% }; %>
                 </textarea>

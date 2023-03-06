@@ -33,9 +33,9 @@
         <!-- metadata -->
         <%- include ("partials/metadata") %>
         <!-- publish -->
-        <button type="submit" class="btn btn-primary" form="base-text">Publish</button>
+        <a href="/edition/<%= idEdition %>-<%= idEditor %>" class="btn btn-primary publish-btn" data-value="publish">Publish</a>
         <!-- save as draft -->
-        <button type="button" class="btn btn-light border">Save as draft</button>
+        <a href="/edition/<%= idEdition %>-<%= idEditor %>" class="btn btn-light border publish-btn" data-value="saveAsDraft">Save as draft</a>
       </div>
     </div>
   </div>

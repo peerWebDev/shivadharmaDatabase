@@ -480,37 +480,37 @@ router.get("/edit/:id", async (req, res) => {
                         /* array of variants for each lemma */
                         lemmaVariantWitness_temp.forEach((el) => {
                             //if (el["start"]["labels"] == "Lemma") {
-                                if (el["start"]["properties"]["value"] == lemma) {
-                                    el["segments"].forEach((segment) => {
-                                        if (segment["start"]["labels"] == "Variant") {
+                            if (el["start"]["properties"]["value"] == lemma) {
+                                el["segments"].forEach((segment) => {
+                                    if (segment["start"]["labels"] == "Variant") {
 
-                                            /* variant */
-                                            var variant = segment["start"]["properties"]["value"];
+                                        /* variant */
+                                        var variant = segment["start"]["properties"]["value"];
 
-                                            /* variant dict */
-                                            var variantDict = JSON.stringify({
-                                                idAnnotation: segment["start"]["properties"]["idVariant"],
-                                                variant: variant,
-                                                number: segment["start"]["properties"]["number"],
-                                                notes: segment["start"]["properties"]["notes"]
-                                            })
+                                        /* variant dict */
+                                        var variantDict = JSON.stringify({
+                                            idAnnotation: segment["start"]["properties"]["idVariant"],
+                                            variant: variant,
+                                            number: segment["start"]["properties"]["number"],
+                                            notes: segment["start"]["properties"]["notes"]
+                                        })
 
-                                            /* array of variants */
-                                            if (!variants_arr.includes(variantDict)) {
-                                                variants_arr.push(variantDict);
-                                            };
-
-                                            /* array of attested in relation of variant with witnesses */
-                                            if (segment["relationship"]["type"] == "ATTESTED_IN") {
-                                                var witness_relations = JSON.stringify(segment);
-                                                if (!variant_witnesses_data_arr.includes(witness_relations)) {
-                                                    variant_witnesses_data_arr.push(witness_relations);
-                                                };
-                                            };
-
+                                        /* array of variants */
+                                        if (!variants_arr.includes(variantDict)) {
+                                            variants_arr.push(variantDict);
                                         };
-                                    });
-                                };
+
+                                        /* array of attested in relation of variant with witnesses */
+                                        if (segment["relationship"]["type"] == "ATTESTED_IN") {
+                                            var witness_relations = JSON.stringify(segment);
+                                            if (!variant_witnesses_data_arr.includes(witness_relations)) {
+                                                variant_witnesses_data_arr.push(witness_relations);
+                                            };
+                                        };
+
+                                    };
+                                });
+                            };
                             //};
                         });
 
@@ -589,6 +589,8 @@ router.get("/edit/:id", async (req, res) => {
 
                     /* rendering */
                     res.render("edit", {
+                        idEdition: idEdition,
+                        idEditor: idEditor,
                         prevUrl: prevUrl,
                         id: req.params.id,
                         name: req.user.name,
