@@ -34,7 +34,6 @@ router.post("/saveFile", async (req, res) => {
             try {
                 var idFragment = req.body.idFragment;
                 var contentFragment = req.body.contentFragment;
-
                 if (idFragment !== undefined) {
                     await session.writeTransaction(tx => tx
                         .run(
@@ -59,7 +58,6 @@ router.post("/saveFile", async (req, res) => {
                         })
                     );
                 };
-
             } catch (err) {
                 console.log(err);
             } finally {

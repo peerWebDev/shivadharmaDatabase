@@ -870,11 +870,30 @@ let annotations = () => {
                     var idEditor = url.split("/").pop().split("-")[1];
                     var contentFile = tinymce.get("fileBaseTxt").getContent();
 
-                    data = {
-                        idEdition: idEdition,
-                        idEditor: idEditor,
-                        contentFile: contentFile
-                    }
+                    var form = document.querySelector("#" + category + "-req");
+                    var location = form.querySelector(".location");
+                    var inputs = location.querySelectorAll("input[type='number']");
+                    var submitBtn = form.querySelector("button[type='submit']");
+
+                    let detectEmptyForms = () => {
+                        for (var i = 0; i < inputs.length; i++) {
+                            if (inputs[i].value !== "") {
+                                return true;
+                            } else {
+                                return false;
+                            };
+                        };
+                    };
+
+                    submitBtn.addEventListener("click", () => {
+                        if (detectEmptyForms()) {
+                            data = {
+                                idEdition: idEdition,
+                                idEditor: idEditor,
+                                contentFile: contentFile
+                            }
+                        };
+                    });
 
                 } else {
                     /* show default settings */
@@ -911,9 +930,36 @@ let saveFile = () => {
     }, 2000);
 };
 
+/* metadata textareas */
+let metadataTextareas = () => {
+    tinymce.init({
+        selector: ".metadata-container textarea",
+        resize: "both",
+        width: "100%",
+        plugins: "preview searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime lists wordcount help charmap quickbars",
+        menubar: "file edit view insert format tools table help",
+        toolbar: "undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap | fullscreen preview save | image media template link anchor codesample | ltr rtl",
+        toolbar_sticky: false,
+        autosave_ask_before_unload: true,
+        autosave_interval: "30s",
+        autosave_prefix: "{path}{query}-{id}-",
+        autosave_restore_when_empty: false,
+        autosave_retention: "2m",
+        image_advtab: true,
+        template_cdate_format: "[Date Created (CDATE): %m/%d/%Y : %H:%M:%S]",
+        template_mdate_format: "[Date Modified (MDATE): %m/%d/%Y : %H:%M:%S]",
+        height: "50vh",
+        image_caption: true,
+        quickbars_selection_toolbar: "bold italic | quicklink h2 h3 blockquote quickimage quicktable",
+        toolbar_mode: "sliding",
+        contextmenu: "link image table"
+    });
+};
+
 /* ONLOAD EDIT PAGE */
 let onloadEdit = () => {
     fileTextarea();
+    metadataTextareas();
     setInterval(saveFile, 5000);
 }
 
@@ -1146,7 +1192,6 @@ let modifyAnnotations = () => {
             /* clone variant containers */
             let cloneVariantContainers = () => {
                 var variants = dataContainer.querySelectorAll("[data-subtype='variant']");
-
                 for (var i = 0; i < variants.length; i++) {
                     form.querySelector("[data-clone='variant']").click();
                 };
