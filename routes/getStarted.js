@@ -23,6 +23,8 @@ router.post("/getstarted",
                     MERGE (work)-[:HAS_MANIFESTATION]->(edition)
                     MERGE (work)-[:WRITTEN_BY]->(author)
                     MERGE (edition)-[:EDITED_BY]->(editor)
+                    ON CREATE
+                        SET edition.publishType = "Save as draft"
                     RETURN work.title, ID(edition), edition.title, author.name, ID(editor), editor.name
                     `,
                     {
