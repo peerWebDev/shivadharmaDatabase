@@ -133,11 +133,6 @@ router.post("/addApparatus/:id", async (req, res) => {
                             MERGE (variant)-[:ATTESTED_IN]->(witness)
                         )
 
-                        WITH variant
-                        MATCH ()-[r:ATTESTED_IN]->(witness:Witness)
-                        WHERE witness.siglum = ""
-                        DELETE r
-
                         RETURN *
                         `
                 )

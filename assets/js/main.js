@@ -551,7 +551,6 @@ let cloneEl = () => {
 
 /* annotations */
 let annotations = () => {
-
     [].forEach.call(document.querySelectorAll(".btn-annotation"), (el) => {
 
         /* annotation type */
@@ -559,6 +558,12 @@ let annotations = () => {
 
         /* CLICK ON THE BUTTON TO ADD ANNOTATIONS */
         el.addEventListener("click", () => {
+
+            /* block all the buttons */
+            const btns = document.querySelectorAll(".btn-set-annotation button");
+            for (var i = 0; i < btns.length; i++) {
+                btns[i].setAttribute("disabled", "disabled");
+            };
 
             /* type of annotation */
             var category = el.getAttribute("data-value");
@@ -821,9 +826,8 @@ let annotations = () => {
 
                     /* CANCEL BUTTON */
                     /* assign the same id to the cancel button */
-                    /* var annotationForm = document.querySelector(".annotation-form:not(.d-none)");
-                    var safeCancelBtn = annotationForm.querySelector("button[data-type='cancel-annotation']");
-                    safeCancelBtn.setAttribute("data-cancel", "#" + idAnnotation); */
+                    var safeCancelBtn = document.querySelector("button[data-type='cancel-annotation']");
+                    safeCancelBtn.setAttribute("data-cancel", "#" + idAnnotation);
 
                     /* init textareas */
                     var selector = "." + category + "-container textarea";
@@ -885,11 +889,18 @@ let annotations = () => {
 
                     submitBtn.addEventListener("click", () => {
                         if (detectEmptyForms()) {
+                            /* send the file new content to the server */
                             data = {
                                 idEdition: idEdition,
                                 idEditor: idEditor,
                                 contentFile: contentFile
                             }
+
+                            /* unblock all the buttons */
+                            const btns = document.querySelectorAll(".btn-set-annotation button");
+                            for (var i = 0; i < btns.length; i++) {
+                                btns[i].removeAttribute("disabled");
+                            };
                         };
                     });
 
@@ -1055,7 +1066,6 @@ let previewAnnotations = () => {
 
 /* cancel annotations */
 let cancelAnnotations = () => {
-
     /* modal */
     var modals = document.querySelectorAll("div[data-role='cancel-annotation']");
     modals.forEach((modal) => {
@@ -1066,37 +1076,43 @@ let cancelAnnotations = () => {
             /* typing in the input */
             safeDeletionInput.addEventListener("keyup", () => {
                 /* check the value of the input */
-                if (safeDeletionInput.value == "martinadellobuono") {
+                if (safeDeletionInput.value == "cancel-annotation") {
                     /* enable the save changes button */
                     saveChangesBtn.removeAttribute("disabled");
                     /* save changes */
                     saveChangesBtn.addEventListener("click", () => {
-
                         /* CANCEL THE ANNOTATION */
-                        var annotationForm = document.querySelector(".annotation-form:not(.d-none)");
-                        var safeCancelBtn = annotationForm.querySelector("button[data-type='cancel-annotation']");
+                        var safeCancelBtn = document.querySelector("button[data-type='cancel-annotation']");
                         var annotationId = safeCancelBtn.getAttribute("data-cancel");
                         /* search all elements with the annotation id */
-                        var annotationDiv = tinymce.activeEditor.dom.select('div[data-annotation="' + annotationId + '"]');
+                        var annotationDiv = tinymce.get("fileBaseTxt").dom.select('span[data-annotation="' + annotationId + '"]');
+
                         /* reinsert the original content without annotation tags */
                         var newContent = "";
                         annotationDiv.forEach((annotation) => {
-                            var annotationChildren = annotation.childNodes;
-                            annotationChildren.forEach((el) => {
-                                if (el.tagName == "SPAN") {
-                                    /* it will be automatically removed */
-                                } else if (el.tagName == "P") {
-                                    newContent = newContent + el.outerHTML;
-                                } else {
-                                    var txt = el.textContent
-                                    annotation.outerHTML = "" + txt;
-                                    newContent = "";
+                            /* remove milestones */
+                            if (annotation.getAttribute("data-type") == "milestone") {
+                                annotation.remove();
+                            } else {
+                                /* remove annotations */
+                                var annotationChildren = annotation.childNodes;
+                                annotationChildren.forEach((el) => {
+                                    if (el.tagName == "SPAN") {
+
+                                    } else if (el.tagName == "P") {
+                                        newContent = newContent + el.outerHTML;
+                                    } else {
+                                        var txt = el.textContent
+                                        annotation.outerHTML = "" + txt;
+                                        newContent = "";
+                                    };
+                                });
+                                if (newContent !== "") {
+                                    annotation.outerHTML = newContent;
                                 };
-                            });
-                            if (newContent !== "") {
-                                annotation.outerHTML = newContent;
                             };
                         });
+
                         /* close the modal */
                         let modalToClose = bootstrap.Modal.getInstance(modal);
                         modalToClose.hide();
@@ -1105,6 +1121,11 @@ let cancelAnnotations = () => {
                         var defaultSettings = document.querySelector(".default-settings");
                         defaultSettings.classList.remove("d-none");
 
+                        /* unblock the annotation buttons */
+                        const btns = document.querySelectorAll(".btn-set-annotation button");
+                        for (var i = 0; i < btns.length; i++) {
+                            btns[i].removeAttribute("disabled");
+                        };
                     });
                 } else {
                     /* disable the save changes button */
@@ -1119,15 +1140,12 @@ let cancelAnnotations = () => {
                 /* empty the input */
                 safeDeletionInput.value = "";
             });
-
         });
     });
-
 };
 
 /* close annotation box when clicking on another annotation button */
 let closeAnnotationBox = () => {
-
     /* reset the empty annotation box */
     var defaultAnnotationBox = document.querySelector(".annotations-box-below");
     defaultAnnotationBox.classList.remove("d-none");
@@ -1142,7 +1160,6 @@ let closeAnnotationBox = () => {
     if (smaller.length > 0) {
         if (smaller.length > 0) {
             smaller.forEach((el) => {
-
                 /* reset the col */
                 el.classList.add("col-md-1");
                 el.classList.remove("col-md-4");
@@ -1154,16 +1171,12 @@ let closeAnnotationBox = () => {
 
                 /* hide the close button */
                 el.querySelector(".btn-close").classList.add("d-none");
-
             });
         };
     } else {
-
         /* hide the forms */
         document.querySelector(".annotation-form").classList.add("d-none");
-
     };
-
 };
 
 /* close annotation box when clicking on another annotation button */

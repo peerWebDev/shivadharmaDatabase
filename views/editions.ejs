@@ -26,14 +26,19 @@
                 <a href="/edit/<%= edition.get('ID(edition)') %>-<%= edition.get('ID(editor)') %>" class="btn btn-light btn-sm" title="Edit the edition">Edit the edition</a>
               <% }; %>
             </li>
+          <% } else { %>
+            <div class="mt-3">
+              <p>No edition is available for now.</p>
+              <a href="/apikey" class="btn btn-primary" title="Read the edition">Create an edition</a>
+            </div>
           <% }; %>
         <% }); %>
       </ul>
       <% } else { %>
-      <div>
-        <p>No edition is available for now.</p>
-        <a href="/apikey" class="btn btn-primary" title="Read the edition">Create an edition</a>
-      </div>
+        <div>
+          <p>No edition is available for now.</p>
+          <a href="/apikey" class="btn btn-primary" title="Read the edition">Create an edition</a>
+        </div>
       <% }; %>
     </div>
   </div>

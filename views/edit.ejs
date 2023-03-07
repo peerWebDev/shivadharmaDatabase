@@ -116,9 +116,29 @@
       </div>
       <!-- translation -->
       <div class="col-md-1 border p-3 enlarge-col specific-cols">
-        <button type="button" class="btn-close float-end d-none" aria-label="Close" data-bs-toggle="modal" data-bs-target="#cancel-annotation" data-type="cancel-annotation"></button>
+        <!-- cancel annotation -->
+        <button type="button" class="btn-close float-end d-none" aria-label="Close" data-bs-toggle="modal" data-bs-target="#cancel-translation" data-type="cancel-annotation"></button>
+        <div class="modal fade" id="cancel-translation" data-role="cancel-annotation" tabindex="-1" aria-labelledby="cancel-translation" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Are you sure to cancel this annotation?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <p>Please type <b>cancel-annotation</b> to confirm.</p>
+                <input type="text" class="form-control" data-role="safe-deletion">
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-role="safe-deletion-btn" disabled>Save changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- translation -->
         <h3 class="h6">Translation</h3>
-        <div class="btn-group-vertical btn-vertical">
+        <div class="btn-group-vertical btn-vertical btn-set-annotation">
           <button type="button" class="btn btn-sm btn-preview btn-teal" data-value="translation" title="Insert/check translations"><i class="bi bi-eye-fill"></i></button>
           <button type="button" class="btn btn-sm btn-annotation btn-teal mb-2" data-value="translation" title="Insert/check translations"><i class="bi bi-pencil-fill"></i></button>
         </div>
@@ -128,9 +148,29 @@
       </div>
       <!-- parallels -->
       <div class="col-md-1 border p-3 enlarge-col specific-cols">
-        <button type="button" class="btn-close float-end d-none" aria-label="Close" data-bs-toggle="modal" data-bs-target="#cancel-annotation" data-type="cancel-annotation"></button>
+        <!-- cancel annotation -->
+        <button type="button" class="btn-close float-end d-none" aria-label="Close" data-bs-toggle="modal" data-bs-target="#cancel-parallel" data-type="cancel-annotation"></button>
+        <div class="modal fade" id="cancel-parallel" data-role="cancel-annotation" tabindex="-1" aria-labelledby="cancel-parallel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Are you sure to cancel this annotation?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <p>Please type <b>cancel-annotation</b> to confirm.</p>
+                <input type="text" class="form-control" data-role="safe-deletion">
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-role="safe-deletion-btn" disabled>Save changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- parallels -->
         <h3 class="h6">Parallels</h3>
-        <div class="btn-group-vertical btn-vertical">
+        <div class="btn-group-vertical btn-vertical btn-set-annotation">
           <button type="button" class="btn btn-sm btn-preview btn-orange" data-value="parallel" title="Preview parallels"><i class="bi bi-eye-fill"></i></button>
           <button type="button" class="btn btn-sm btn-orange btn-annotation mb-2" data-value="parallel" title="Insert/check parallels"><i class="bi bi-pencil-fill"></i></button>
         </div>
@@ -140,9 +180,29 @@
       </div>
       <!-- commentary -->
       <div class="col-md-1 border p-3 enlarge-col specific-cols">
-        <button type="button" class="btn-close float-end d-none" aria-label="Close" data-bs-toggle="modal" data-bs-target="#cancel-annotation" data-type="cancel-annotation"></button>
+        <!-- cancel annotation -->
+        <button type="button" class="btn-close float-end d-none" aria-label="Close" data-bs-toggle="modal" data-bs-target="#cancel-commentary" data-type="cancel-annotation"></button>
+        <div class="modal fade" id="cancel-commentary" data-role="cancel-annotation" tabindex="-1" aria-labelledby="cancel-commentary" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Are you sure to cancel this annotation?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <p>Please type <b>cancel-annotation</b> to confirm.</p>
+                <input type="text" class="form-control" data-role="safe-deletion">
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-role="safe-deletion-btn" disabled>Save changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- commentary -->
         <h3 class="h6">Commentary</h3>
-        <div class="btn-group-vertical btn-vertical">
+        <div class="btn-group-vertical btn-vertical btn-set-annotation">
           <button type="button" class="btn btn-sm btn-preview btn-indigo" data-value="commentary" title="Preview commentary"><i class="bi bi-eye-fill"></i></button>
           <button type="button" class="btn btn-sm btn-indigo btn-annotation mb-2" data-value="commentary" title="Insert/check commentary"><i class="bi bi-pencil-fill"></i></button>
         </div>
@@ -152,9 +212,29 @@
       </div>
       <!-- citations -->
       <div class="col-md-1 border p-3 enlarge-col specific-cols">
-        <button type="button" class="btn-close float-end d-none" aria-label="Close" data-bs-toggle="modal" data-bs-target="#cancel-annotation" data-type="cancel-annotation"></button>
+        <!-- cancel annotation -->
+        <button type="button" class="btn-close float-end d-none" aria-label="Close" data-bs-toggle="modal" data-bs-target="#cancel-citation" data-type="cancel-annotation"></button>
+        <div class="modal fade" id="cancel-citation" data-role="cancel-annotation" tabindex="-1" aria-labelledby="cancel-citation" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Are you sure to cancel this annotation?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <p>Please type <b>cancel-annotation</b> to confirm.</p>
+                <input type="text" class="form-control" data-role="safe-deletion">
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-role="safe-deletion-btn" disabled>Save changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- citations -->
         <h3 class="h6">Citations</h3>
-        <div class="btn-group-vertical btn-vertical">
+        <div class="btn-group-vertical btn-vertical btn-set-annotation">
           <button type="button" class="btn btn-sm btn-preview btn-fuchsia" data-value="citation" title="Preview citations"><i class="bi bi-eye-fill"></i></button>
           <button type="button" class="btn btn-sm btn-fuchsia btn-annotation mb-2" data-value="citation" title="Insert/check citations"><i class="bi bi-pencil-fill"></i></button>
         </div>
@@ -170,39 +250,19 @@
       <div class="col-md-12">
         <span>Insert/check: </span>
         <!-- text structure -->
-        <div class="btn-group" role="group">
+        <div class="btn-group btn-set-annotation" role="group">
           <button type="button" class="btn btn-sm btn-preview btn-secondary" data-value="textStructure" title="Preview text structure"><i class="bi bi-eye-fill"></i></button>
           <button type="button" class="btn btn-sm btn-annotation btn-secondary" data-value="textStructure" title="Insert/check text structure"><i class="bi bi-pencil-fill"></i> Text structure</button>
         </div>
         <!-- apparatus entry -->
-        <div class="btn-group" role="group">
+        <div class="btn-group btn-set-annotation" role="group">
           <button type="button" class="btn btn-sm btn-preview btn-yellow" data-value="apparatus" title="Preview apparatus"><i class="bi bi-eye-fill"></i></button>
           <button type="button" class="btn btn-sm btn-annotation btn-yellow" data-value="apparatus" title="Insert/check text structure"><i class="bi bi-pencil-fill"></i> Apparatus entry</button>
         </div>
         <!-- note -->
-        <div class="btn-group" role="group">
+        <div class="btn-group btn-set-annotation" role="group">
           <button type="button" class="btn btn-sm btn-preview btn-blue" data-value="note" title="Preview notes"><i class="bi bi-eye-fill"></i></button>
           <button type="button" class="btn btn-sm btn-annotation btn-blue" data-value="note" title="Insert/check notes"><i class="bi bi-pencil-fill"></i> Note on the text</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- check annotation modal -->
-  <div class="modal fade" id="cancel-annotation" data-role="cancel-annotation" tabindex="-1" aria-labelledby="cancel-annotation" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Are you sure to cancel this annotation?</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>Please type <b>martinadellobuono</b> to confirm.</p>
-          <input type="text" class="form-control" data-role="safe-deletion">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" data-role="safe-deletion-btn" disabled>Save changes</button>
         </div>
       </div>
     </div>
