@@ -117,7 +117,7 @@ After installing the required packages:
   **Username**: neo4j
   **Password**: 123456
 - Run the application locally: **nodemon app.js**
-- Open the application in your browser: **http://0.0.0.0:3000/**
+- Open the application in your browser: **http://0.0.0.0:8080/**
 
 ## Neo4j Graph
 In the application it is possible to create and store data in the Neo4j database, where they are structured as a graph. To create data and check the resulting graph, it is necessary to:
