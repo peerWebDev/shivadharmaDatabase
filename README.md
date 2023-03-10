@@ -59,7 +59,7 @@ npm i express-session@^1.17.3
 ```
 npm i express-validator
 ```
-- [**formidable**] (https://www.npmjs.com/package/formidable) @*
+- [**formidable**](https://www.npmjs.com/package/formidable) @*
 ```
 npm i formidable
 ```
