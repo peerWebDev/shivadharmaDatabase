@@ -16,7 +16,7 @@ const cookieParser = require("cookie-parser");
 
 /* db */
 const neo4j = require("neo4j-driver");
-const driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic("neo4j", "shivadharma_temp_editions"));
+const driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
 
 /* login system */
 const passport = require("passport");
@@ -266,42 +266,12 @@ const account = require("./routes/account");
 app.use("/", account, checkAuthenticated);
 
 /* get started */
-app.get("/getstarted", checkAuthenticated, (req, res) => {
-    res.render("getstarted", { name: req.user.name });
-});
-
 const getStarted = require("./routes/getStarted");
 app.use("/", getStarted);
 
 /* api key */
-app.get("/apikey", checkAuthenticated, (req, res) => {
-    res.render("apikey", { name: req.user.name });
-});
-
-app.post("/apikey", checkAuthenticated, async (req, res) => {
-    /* check if the api key is correct */
-    if (req.body.apikey == process.env.API_KEY) {
-        res.render("getStarted", { name: req.user.name });
-    } else {
-        res.render("apikey", { name: req.user.name, errorMessage: "Incorrect access key" });
-    };
-});
-
-/* do not allow non-authenticated users */
-function checkAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    };
-    res.redirect("/login");
-};
-
-/* do not go back to login if logged users */
-function checkNotAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return res.redirect("/");
-    };
-    next();
-};
+const apikey = require("./routes/apikey");
+app.use("/", apikey, checkAuthenticated);
 
 /* edit */
 const edit = require("./routes/edit");
@@ -368,7 +338,23 @@ app.use("/", documentation, checkAuthenticated);
 const credits = require("./routes/credits");
 app.use("/", credits, checkAuthenticated);
 
-const port = process.env.PORT || 8080;
+/* do not allow non-authenticated users */
+function checkAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    };
+    res.redirect("/login");
+};
+
+/* do not go back to login if logged users */
+function checkNotAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return res.redirect("/");
+    };
+    next();
+};
+
+const port = process.env.PORT || 80;
 app.listen(port, () => console.log(`Shivadharma listening on port localhost:${port}`));
 
 module.exports = app;
