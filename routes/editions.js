@@ -1,13 +1,9 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-
 const passport = require("passport");
-
 const neo4j = require("neo4j-driver");
 const driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic("neo4j", "shivadharma_temp_editions"));
-
 const router = express.Router();
-
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: false }));
 
