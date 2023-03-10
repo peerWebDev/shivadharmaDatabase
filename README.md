@@ -79,6 +79,10 @@ npm i method-override
 ```
 npm i neo4j-driver
 ```
+- [**nodemon**](https://www.npmjs.com/package/nodemon) @*
+```
+npm i nodemon
+```
 - [**npm**](https://www.npmjs.com/package/npm) @^8.13.1
 ```
 npm i npm@^8.13.1
