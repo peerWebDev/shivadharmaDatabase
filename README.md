@@ -115,13 +115,14 @@ After installing the required packages:
 - Download **Neo4j Desktop**: https://neo4j.com/download/
 - Create a new **Project**
 - Click on the **Add** button
-- Select **Remote connection**
-- Insert the **Connection URL**: bolt://localhost:7687
-- Insert the credentials:
-  **Username**: neo4j
-  **Password**: 123456
+- Select **Local DBMS**
+- Set **bolt://localhost:7687** as **Connect URL**
+- Choose a **user** and a **password**
+- Insert the credentials in .env:
+  **Username**: NEO4J_USER = insert the user set in the db
+  **Password**: NEO4J_PW = insert the password set in the db
 - Run the application locally: **nodemon app.js**
-- Open the application in your browser: **http://0.0.0.0:8080/**
+- Open the application in your browser: **http://0.0.0.0:80/**
 
 ## Neo4j Graph
 In the application it is possible to create and store data in the Neo4j database, where they are structured as a graph. To create data and check the resulting graph, it is necessary to:
