@@ -76,22 +76,6 @@ app.use(methodOverride("_method"));
 /* cookies */
 app.use(cookieParser());
 
-/* do not allow non-authenticated users */
-function checkAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    };
-    res.redirect("/login");
-};
-
-/* do not go back to login if logged users */
-function checkNotAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return res.redirect("/");
-    };
-    next();
-};
-
 /* index */
 app.get("/", checkAuthenticated, (req, res) => {
 
@@ -141,9 +125,65 @@ app.get("/", checkAuthenticated, (req, res) => {
 
 });
 
+/* login system */
 /* register */
-const register = require("./routes/register");
-app.use("/", register, checkNotAuthenticated);
+app.get("/register", checkNotAuthenticated, async (req, res) => {
+    res.render("register");
+});
+
+app.post("/register", checkNotAuthenticated, async (req, res) => {
+    try {
+        /* crypt the password */
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+        /* insert user in the db */
+        const session = driver.session();
+        try {
+            await session.writeTransaction(tx => tx
+                .run(
+                    `
+                    MERGE (editor:Editor {name: "${req.body.name}", email: "${req.body.email}", password: "${hashedPassword}"})
+                    RETURN id(editor), editor.name, editor.email, editor.password
+                    `
+                )
+                .subscribe({
+                    onNext: record => {
+                        /* user id */
+                        var ids = [];
+                        var id;
+                        if (!ids.includes(record.get("id(editor)"))) {
+                            ids.push(record.get("id(editor)"));
+                        };
+                        ids.forEach(el => {
+                            id = el["low"];
+                        });
+                        /* save the user */
+                        users.push({
+                            id: id,
+                            name: record.get("editor.name"),
+                            email: record.get("editor.email"),
+                            password: record.get("editor.password")
+                        });
+                    },
+                    onCompleted: () => {
+                        console.log("Data added to the database")
+                    },
+                    onError: err => {
+                        console.log(err)
+                    }
+                })
+            );
+        } catch (err) {
+            console.log(err);
+        } finally {
+            await session.close();
+        };
+    } catch (err) {
+        console.log(err);
+    } finally {
+        res.redirect("/login");
+    };
+});
 
 /* login */
 app.get("/login", checkNotAuthenticated, async (req, res) => {
@@ -247,6 +287,22 @@ app.post("/apikey", checkAuthenticated, async (req, res) => {
     };
 });
 
+/* do not allow non-authenticated users */
+function checkAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    };
+    res.redirect("/login");
+};
+
+/* do not go back to login if logged users */
+function checkNotAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return res.redirect("/");
+    };
+    next();
+};
+
 /* edit */
 const edit = require("./routes/edit");
 app.use("/", edit, checkAuthenticated);
@@ -312,7 +368,7 @@ app.use("/", documentation, checkAuthenticated);
 const credits = require("./routes/credits");
 app.use("/", credits, checkAuthenticated);
 
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 8080;
 app.listen(port, () => console.log(`Shivadharma listening on port localhost:${port}`));
 
 module.exports = app;
