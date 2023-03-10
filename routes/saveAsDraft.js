@@ -9,7 +9,7 @@ const router = express.Router();
 router.use(bodyParser.json({ limit: "50mb" }));
 router.use(bodyParser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
 
-router.post("/publish/:id", async (req, res) => {
+router.post("/saveAsDraft/:id", async (req, res) => {
     var idEdition = req.params.id.split("/").pop().split("-")[0];
     var idEditor = req.params.id.split("/").pop().split("-")[1];
     var path = `${__dirname}/../uploads/${idEdition}-${idEditor}.html`;
@@ -17,16 +17,16 @@ router.post("/publish/:id", async (req, res) => {
         fs.access(path, fs.F_OK, () => {
             fs.writeFile(path, req.body.fileBaseTxt, "utf8", (err) => {
                 if (err) {
-                    console.log("Error related to rewriting the file: " + err);
+                    console.log(err);
                 } else {
                     console.log("The file has been overwritten");
                 };
             });
         });
     } catch (error) {
-        console.log("Error in rewriting the file: " + error);
+        console.log(error);
     } finally {
-        res.redirect("../edit/" + idEdition + "-" + idEditor);
+        res.redirect("../account");
     };
 });
 

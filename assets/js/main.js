@@ -12,8 +12,6 @@ document.addEventListener("DOMContentLoaded", () => {
     previewAnnotations();
     closeBtn();
     modifyAnnotations();
-    liveCheck();
-    liveCheckPresence();
     truncation();
     lemmaVariantPresence();
     witnessDimensions();
@@ -568,6 +566,12 @@ let annotations = () => {
             /* type of annotation */
             var category = el.getAttribute("data-value");
 
+            /* live check if apparatus */
+            if (category == "apparatus") {
+                liveCheck();
+                liveCheckPresence();
+            };
+
             /* root ID of annotation */
             var idAnnotation = category + Math.random().toString(16).slice(2) + (new Date()).getTime();
 
@@ -831,8 +835,6 @@ let annotations = () => {
 
                     /* init textareas */
                     var selector = "." + category + "-container textarea";
-                    var name = document.querySelector(selector).getAttribute("name");
-                    var content;
 
                     tinymce.init({
                         selector: selector,
@@ -854,15 +856,7 @@ let annotations = () => {
                         image_caption: true,
                         quickbars_selection_toolbar: "bold italic | quicklink h2 h3 blockquote quickimage quicktable",
                         toolbar_mode: "sliding",
-                        contextmenu: "link image table",
-                        setup: (ed) => {
-
-                            /* LIVE CHECK */
-                            ed.on("keyup", (e) => {
-                                content = ed.getContent();
-                                document.getElementById("live-" + name).innerHTML = content;
-                            });
-                        }
+                        contextmenu: "link image table"
                     });
 
                     /* SAVE FILE */
@@ -924,7 +918,7 @@ let annotations = () => {
 /* save file every 5 seconds */
 let saveFile = () => {
     /* fetch data */
-    fetch("http://localhost:3000/saveFile", {
+    fetch("http://localhost:8080/saveFile", {
         method: "POST",
         body: JSON.stringify(data),
         headers: { "Content-type": "application/json; charset=UTF-8" }
@@ -982,7 +976,7 @@ let publishEdition = () => {
             }
 
             /* fetch the type of publishment */
-            var route = "http://localhost:3000/publish/" + idEdition + "-" + idEditor;
+            var route = "http://localhost:8080/publish/" + idEdition + "-" + idEditor;
             fetch(route, {
                 method: "POST",
                 body: JSON.stringify(publishType),
@@ -1320,12 +1314,16 @@ let modifyAnnotations = () => {
                     let lists = () => {
                         var lists = form.querySelectorAll("[data-list][name='" + name + "']");
                         lists.forEach((list) => {
+
                             /* fill the list */
                             list.value = val;
 
                             /* live check */
                             if (type == "apparatus") {
-                                document.getElementById("live-" + name).innerHTML = val;
+                                var vals = [];
+                                vals.push(val);
+                                console.log(vals);
+                                document.getElementById("live-" + name).innerHTML = val.replace(" ; ", " ");
                             };
                         });
                     };
@@ -1407,7 +1405,6 @@ let liveCheck = () => {
     input.forEach((el) => {
         "change keyup".split(" ").forEach((e) => {
             el.addEventListener(e, () => {
-
                 /* RADIOS */
                 if (el.getAttribute("type") == "radio") {
                     var radiosParents = el.parentNode.querySelectorAll(".form-check");
@@ -1465,10 +1462,11 @@ let liveCheck = () => {
 
                 /* TEXT */
                 if (el.getAttribute("type") == "text") {
+                    /* print value of lemma and variants */
+                    document.getElementById("live-" + el.getAttribute("name")).innerHTML = el.value;
+
                     /* lemma */
                     if (el.getAttribute("name") == "lemma") {
-                        /* print value of lemma */
-                        document.getElementById("live-lemma").innerHTML = el.value;
                         /* bracket */
                         document.getElementById("lemma-bracket").classList.remove("d-none");
                     };
@@ -1546,10 +1544,6 @@ let liveCheck = () => {
                 if (el.getAttribute("type") == "search") {
                     document.getElementById("live-" + el.getAttribute("name")).innerHTML = el.value.replace(/[;]/g, " ");
                 };
-
-                /* TEXTAREA */
-                /* in annotations(); */
-
             });
         });
     });
