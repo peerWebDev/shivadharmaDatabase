@@ -75,7 +75,7 @@ npm i mammoth@^1.5.1
 ```
 npm i method-override
 ```
-- [**neo4j-driver**] (https://www.npmjs.com/package/neo4j-driver) @*
+- [**neo4j-driver**](https://www.npmjs.com/package/neo4j-driver) @*
 ```
 npm i neo4j-driver
 ```
