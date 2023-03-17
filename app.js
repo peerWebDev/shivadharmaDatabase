@@ -354,7 +354,7 @@ function checkNotAuthenticated(req, res, next) {
     next();
 };
 
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 8080;
 app.listen(port, () => console.log(`Shivadharma listening on port localhost:${port}`));
 
 module.exports = app;
