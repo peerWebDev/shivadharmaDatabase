@@ -121,6 +121,9 @@ After installing the required packages:
 - Insert the credentials in .env:
   **Username**: NEO4J_USER = insert the user set in the db
   **Password**: NEO4J_PW = insert the password set in the db
+- In .env add:
+API_KEY = your_personal_api_key
+To set the API key to access the Create an edition functionalities.
 - Run the application locally: **nodemon app.js**
 - Open the application in your browser: **http://0.0.0.0:8080/**
 
