@@ -2,7 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const fs = require("fs");
 const neo4j = require("neo4j-driver");
-const driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
+const driver = neo4j.driver(process.env.NEO4J_URL, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
 const router = express.Router();
 router.use(bodyParser.json({ limit: "50mb" }));
 router.use(bodyParser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
@@ -101,7 +101,7 @@ router.post("/addWitnesses/:id", async (req, res) => {
 
                 tx.run(
                     `
-                    MATCH (author:Author)<-[:WRITTEN_BY]-(work:Work)-[:HAS_MANIFESTATION]->(edition:Edition)-[:EDITED_BY]->(editor:Editor)  
+                    MATCH (author:Author)<-[:WRITTEN_BY]-(work:Work)-[:HAS_MANIFESTATION]->(edition:Edition)<-[:IS_EDITOR_OF]-(editor:Editor)  
                     WHERE id(edition) = ${idEdition} AND id(editor) = ${idEditor}
                     OPTIONAL MATCH (edition)-[:PUBLISHED_ON]->(date:Date)
                     MERGE (witness:Witness {
@@ -146,7 +146,7 @@ router.post("/addWitnesses/:id", async (req, res) => {
                 )
                     .subscribe({
                         onCompleted: () => {
-                            console.log("Data added to the database")
+                            console.log("Witness added to the database")
                         },
                         onError: err => {
                             console.log(err)
@@ -159,7 +159,7 @@ router.post("/addWitnesses/:id", async (req, res) => {
         console.log(err);
     } finally {
         await session.close();
-        res.redirect(`../edit/${idEdition}-${idEditor}`);
+        res.redirect(process.env.URL_PATH + `/edit/${idEdition}-${idEditor}`);
     };
 });
 

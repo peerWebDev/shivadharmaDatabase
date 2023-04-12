@@ -1,15 +1,12 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const fs = require("fs");
-const passport = require("passport");
 const neo4j = require("neo4j-driver");
-const driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
+const driver = neo4j.driver(process.env.NEO4J_URL, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
 const router = express.Router();
 router.use(bodyParser.json({ limit: "50mb" }));
 router.use(bodyParser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
 
-router.get("/account", async (req, res) => {
-
+router.get(process.env.URL_PATH + "/account", async (req, res) => {
     /* store the current url in a cookie */
     /* previous url */
     var prevUrl;
@@ -38,7 +35,7 @@ router.get("/account", async (req, res) => {
 
     /* user */
     const user = req.user.name;
-
+    
     /* editions */
     var editions = [];
     var idEditor;
@@ -50,7 +47,7 @@ router.get("/account", async (req, res) => {
             const data = await session.readTransaction(tx => tx
                 .run(
                     `
-                    MATCH (edition:Edition)-[e:EDITED_BY]->(editor:Editor)
+                    MATCH (edition:Edition)<-[:IS_EDITOR_OF]-(editor:Editor)
                     WHERE editor.name = "${user}"
                     RETURN edition.publishType, edition.title, id(edition), id(editor)
                     ORDER BY edition.title
@@ -83,7 +80,6 @@ router.get("/account", async (req, res) => {
             email: req.user.email
         });
     };
-
 });
 
 module.exports = router;

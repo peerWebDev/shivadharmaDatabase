@@ -1,14 +1,13 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const fs = require("fs");
-const passport = require("passport");
 const neo4j = require("neo4j-driver");
-const driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
+const driver = neo4j.driver(process.env.NEO4J_URL, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
 const router = express.Router();
 router.use(bodyParser.json({ limit: "50mb" }));
 router.use(bodyParser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
 
-router.get("/edition/:id", async (req, res) => {
+router.get(process.env.URL_PATH + "/edition/:id", async (req, res) => {
     
     /* previous url */
     var prevUrl;
@@ -68,7 +67,7 @@ router.get("/edition/:id", async (req, res) => {
         await session.readTransaction(tx => tx
             .run(
                 `
-                MATCH (author:Author)<-[:WRITTEN_BY]-(work:Work)-[:HAS_MANIFESTATION]->(edition:Edition)-[:EDITED_BY]->(editor:Editor)
+                MATCH (author:Author)<-[:WRITTEN_BY]-(work:Work)-[:HAS_MANIFESTATION]->(edition:Edition)<-[:IS_EDITOR_OF]-(editor:Editor)
                 WHERE id(edition) = ${idEdition} AND id(editor) = ${idEditor}
                 OPTIONAL MATCH (edition)-[:PUBLISHED_ON]->(date:Date)
                 OPTIONAL MATCH (edition)-[:HAS_FRAGMENT]->(selectedFragment:SelectedFragment)
@@ -88,32 +87,48 @@ router.get("/edition/:id", async (req, res) => {
                 onNext: record => {
 
                     /* work */
-                    workMatrix = record.get("work.title");
+                    if (record.get("work.title") !== null) {
+                        workMatrix = record.get("work.title");
+                    };
 
                     /* title */
-                    title = record.get("edition.title");
+                    if (record.get("edition.title") !== null) {
+                        title = record.get("edition.title");
+                    };
 
                     /* editionOf */
-                    editionOf = record.get("edition.editionOf");
+                    if (record.get("edition.editionOf") !== null) {
+                        editionOf = record.get("edition.editionOf");
+                    };
 
                     /* author(s) */
                     if (!authors.includes(record.get("author.name"))) {
-                        authors.push(record.get("author.name"));
+                        if (record.get("author.name") !== null) {
+                            authors.push(record.get("author.name"));
+                        };
                     };
 
                     /* author of the commentary */
-                    authorCommentary = record.get("edition.authorCommentary");
+                    if (record.get("edition.authorCommentary") !== null) {
+                        authorCommentary = record.get("edition.authorCommentary");
+                    };
 
                     /* date */
-                    date = record.get("date.on");
+                    if (record.get("date.on") !== null) {
+                        date = record.get("date.on");
+                    };
 
                     /* editor(s) */
                     if (!editors.includes(record.get("editor.name"))) {
-                        editors.push(record.get("editor.name"));
+                        if (record.get("editor.name") !== null) {
+                            editors.push(record.get("editor.name"));
+                        };
                     };
 
                     /* chapter */
-                    chapter = record.get("selectedFragment.chapter");
+                    if (record.get("selectedFragment.chapter") !== null) {
+                        chapter = record.get("selectedFragment.chapter");
+                    };
 
                     /* translations */
                     if (record.get("translation.value") !== null) {
@@ -188,7 +203,9 @@ router.get("/edition/:id", async (req, res) => {
 
                         /* array of commentary entries */
                         if (!parallels_temp.includes(parallels_entry)) {
-                            parallels_temp.push(parallels_entry);
+                            if (parallels_entry !== null) {
+                                parallels_temp.push(parallels_entry);
+                            };
                         };
                     };
 
@@ -236,17 +253,23 @@ router.get("/edition/:id", async (req, res) => {
 
                     /* witnesses */
                     if (!witnesses_temp.includes(record.get("witness"))) {
-                        witnesses_temp.push(record.get("witness"));
+                        if (record.get("witness") !== null) {
+                            witnesses_temp.push(record.get("witness"));
+                        };
                     };
 
                     /* lemma / witnesses */
                     if (!lemmaWitness_temp.includes(record.get("lemmaWitness"))) {
-                        lemmaWitness_temp.push(record.get("lemmaWitness"));
+                        if (record.get("lemmaWitness") !== null) {
+                            lemmaWitness_temp.push(record.get("lemmaWitness"));
+                        };
                     };
 
                     /* lemma / variant / witnesses */
                     if (!lemmaVariantWitness_temp.includes(record.get("lemmaVariantWitness"))) {
-                        lemmaVariantWitness_temp.push(record.get("lemmaVariantWitness"));
+                        if (record.get("lemmaVariantWitness") !== null) {
+                            lemmaVariantWitness_temp.push(record.get("lemmaVariantWitness"));
+                        };
                     };
 
                 },
@@ -464,36 +487,38 @@ router.get("/edition/:id", async (req, res) => {
 
                         /* array of variants for each lemma */
                         lemmaVariantWitness_temp.forEach((el) => {
-                            if (el["start"]["labels"] == "Lemma") {
-                                if (el["start"]["properties"]["value"] == lemma) {
-                                    el["segments"].forEach((segment) => {
-                                        if (segment["start"]["labels"] == "Variant") {
-
-                                            /* variant */
-                                            var variant = segment["start"]["properties"]["value"];
-
-                                            /* variant dict */
-                                            var variantDict = JSON.stringify({
-                                                idAnnotation: segment["start"]["properties"]["idVariant"],
-                                                variant: variant,
-                                                notes: segment["start"]["properties"]["notes"]
-                                            })
-
-                                            /* array of variants */
-                                            if (!variants_arr.includes(variantDict)) {
-                                                variants_arr.push(variantDict);
-                                            };
-
-                                            /* array of attested in relation of variant with witnesses */
-                                            if (segment["relationship"]["type"] == "ATTESTED_IN") {
-                                                var witness_relations = JSON.stringify(segment);
-                                                if (!variant_witnesses_data_arr.includes(witness_relations)) {
-                                                    variant_witnesses_data_arr.push(witness_relations);
+                            if (el !== null) {
+                                if (el["start"]["labels"] == "Lemma") {
+                                    if (el["start"]["properties"]["value"] == lemma) {
+                                        el["segments"].forEach((segment) => {
+                                            if (segment["start"]["labels"] == "Variant") {
+    
+                                                /* variant */
+                                                var variant = segment["start"]["properties"]["value"];
+    
+                                                /* variant dict */
+                                                var variantDict = JSON.stringify({
+                                                    idAnnotation: segment["start"]["properties"]["idVariant"],
+                                                    variant: variant,
+                                                    notes: segment["start"]["properties"]["notes"]
+                                                })
+    
+                                                /* array of variants */
+                                                if (!variants_arr.includes(variantDict)) {
+                                                    variants_arr.push(variantDict);
                                                 };
+    
+                                                /* array of attested in relation of variant with witnesses */
+                                                if (segment["relationship"]["type"] == "ATTESTED_IN") {
+                                                    var witness_relations = JSON.stringify(segment);
+                                                    if (!variant_witnesses_data_arr.includes(witness_relations)) {
+                                                        variant_witnesses_data_arr.push(witness_relations);
+                                                    };
+                                                };
+    
                                             };
-
-                                        };
-                                    });
+                                        });
+                                    };
                                 };
                             };
                         });

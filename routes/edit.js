@@ -1,16 +1,15 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const fs = require("fs");
-const passport = require("passport");
 const neo4j = require("neo4j-driver");
-const driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
+const driver = neo4j.driver(process.env.NEO4J_URL, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
 const { Console } = require("console");
 const router = express.Router();
 
 router.use(bodyParser.json({ limit: "50mb" }));
 router.use(bodyParser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
 
-router.get("/edit/:id", async (req, res) => {
+router.get(process.env.URL_PATH + "/edit/:id", async (req, res) => {
 
     /* previous url */
     var prevUrl;
@@ -72,8 +71,9 @@ router.get("/edit/:id", async (req, res) => {
         await session.readTransaction(tx => tx
             .run(
                 `
-                MATCH (author:Author)<-[:WRITTEN_BY]-(work:Work)-[:HAS_MANIFESTATION]->(edition:Edition)-[:EDITED_BY]->(editor:Editor)
+                MATCH (author:Author)<-[:WRITTEN_BY]-(work:Work)-[:HAS_MANIFESTATION]->(edition:Edition)<-[:IS_EDITOR_OF]-(editor:Editor)
                 WHERE id(edition) = ${idEdition} AND id(editor) = ${idEditor}
+                MATCH (edition)<-[:IS_EDITOR_OF]-(editors:Editor)
                 OPTIONAL MATCH (edition)-[:PUBLISHED_ON]->(date:Date)
                 OPTIONAL MATCH (edition)-[:HAS_FRAGMENT]->(selectedFragment:SelectedFragment)
                 OPTIONAL MATCH (selectedFragment)-[:HAS_TRANSLATION]->(translation:Translation)
@@ -85,39 +85,55 @@ router.get("/edit/:id", async (req, res) => {
                 OPTIONAL MATCH (edition)<-[:USED_IN]-(witness:Witness)
                 OPTIONAL MATCH lemmaWitness = (selectedFragment)-[:HAS_LEMMA]->(lemma:Lemma)-[:ATTESTED_IN]->(lw:Witness)
                 OPTIONAL MATCH lemmaVariantWitness = (lemma)-[:HAS_VARIANT]->(variant:Variant)-[:ATTESTED_IN]->(vw:Witness)
-                RETURN work.title, edition.title, edition.editionOf, edition.authorCommentary, date.on, author.name, editor.name, selectedFragment.chapter, selectedFragment.stanzaStart, selectedFragment.stanzaEnd, selectedFragment.padaStart, selectedFragment.padaEnd, selectedFragment.value, ID(translation), translation.idAnnotation, translation.value, translation.note, ID(commentary), commentary.idAnnotation, commentary.value, commentary.note, commentary.translation, commentary.translationNote, ID(parallel), parallel.idAnnotation, parallel.book, parallel.bookChapter, parallel.bookStanza, parallel.note, parallel.value, parallelWork.title, parallelAuthor.name, ID(citation), citation.idAnnotation, citation.value, ID(note), note.idAnnotation, note.value, witness, lemmaWitness, lemmaVariantWitness 
+                RETURN work.title, edition.title, edition.editionOf, edition.authorCommentary, date.on, author.name, editor.name, selectedFragment.chapter, selectedFragment.stanzaStart, selectedFragment.stanzaEnd, selectedFragment.padaStart, selectedFragment.padaEnd, selectedFragment.value, ID(translation), translation.idAnnotation, translation.value, translation.note, ID(commentary), commentary.idAnnotation, commentary.value, commentary.note, commentary.translation, commentary.translationNote, ID(parallel), parallel.idAnnotation, parallel.book, parallel.bookChapter, parallel.bookStanza, parallel.note, parallel.value, parallelWork.title, parallelAuthor.name, ID(citation), citation.idAnnotation, citation.value, ID(note), note.idAnnotation, note.value, witness, lemmaWitness, lemmaVariantWitness, editors.name
                 `
             )
             .subscribe({
                 onNext: record => {
 
                     /* work */
-                    workMatrix = record.get("work.title");
+                    if (record.get("work.title") !== null) {
+                        workMatrix = record.get("work.title");
+                    };
 
                     /* title */
-                    title = record.get("edition.title");
+                    if (record.get("edition.title") !== null) {
+                        title = record.get("edition.title");
+                    };
 
                     /* editionOf */
-                    editionOf = record.get("edition.editionOf");
+                    if (record.get("edition.editionOf") !== null) {
+                        editionOf = record.get("edition.editionOf");
+                    };
 
                     /* author(s) */
                     if (!authors.includes(record.get("author.name"))) {
-                        authors.push(record.get("author.name"));
+                        if (record.get("author.name") !== null) {
+                            authors.push(record.get("author.name"));
+                        };
                     };
 
                     /* author of the commentary */
-                    authorCommentary = record.get("edition.authorCommentary");
+                    if (record.get("edition.authorCommentary") !== null) {
+                        authorCommentary = record.get("edition.authorCommentary");
+                    };
 
                     /* date */
-                    date = record.get("date.on");
+                    if (record.get("date.on") !== null) {
+                        date = record.get("date.on");
+                    };
 
                     /* editor(s) */
-                    if (!editors.includes(record.get("editor.name"))) {
-                        editors.push(record.get("editor.name"));
+                    if (!editors.includes(record.get("editors.name"))) {
+                        if (record.get("editors.name") !== null) {
+                            editors.push(record.get("editors.name"));
+                        };
                     };
 
                     /* chapter */
-                    chapter = record.get("selectedFragment.chapter");
+                    if (record.get("selectedFragment.chapter") !== null) {
+                        chapter = record.get("selectedFragment.chapter");
+                    };
 
                     /* translations */
                     if (record.get("translation.value") !== null) {
@@ -240,17 +256,23 @@ router.get("/edit/:id", async (req, res) => {
 
                     /* witnesses */
                     if (!witnesses_temp.includes(record.get("witness"))) {
-                        witnesses_temp.push(record.get("witness"));
+                        if (record.get("witness") !== null) {
+                            witnesses_temp.push(record.get("witness"));
+                        };
                     };
 
                     /* lemma / witnesses */
                     if (!lemmaWitness_temp.includes(record.get("lemmaWitness"))) {
-                        lemmaWitness_temp.push(record.get("lemmaWitness"));
+                        if (record.get("lemmaWitness") !== null) {
+                            lemmaWitness_temp.push(record.get("lemmaWitness"));
+                        };
                     };
 
                     /* lemma / variant / witnesses */
                     if (!lemmaVariantWitness_temp.includes(record.get("lemmaVariantWitness"))) {
-                        lemmaVariantWitness_temp.push(record.get("lemmaVariantWitness"));
+                        if (record.get("lemmaVariantWitness") !== null) {
+                            lemmaVariantWitness_temp.push(record.get("lemmaVariantWitness"));
+                        };
                     };
 
                 },
@@ -395,6 +417,7 @@ router.get("/edit/:id", async (req, res) => {
                     /* create an array of lemmas */
                     var lemmas = [];
                     var lemmas_attested_in_relations = [];
+
                     lemmaWitness_temp.forEach((el) => {
                         if (el !== null) {
 
@@ -475,47 +498,49 @@ router.get("/edit/:id", async (req, res) => {
                         });
 
                         /* array of variants for each lemma */
-                        lemmaVariantWitness_temp.forEach((el) => {
-                            //if (el["start"]["labels"] == "Lemma") {
-                            if (el["start"]["properties"]["value"] == lemma) {
-                                el["segments"].forEach((segment) => {
-                                    if (segment["start"]["labels"] == "Variant") {
-
-                                        /* variant */
-                                        var variant = segment["start"]["properties"]["value"];
-
-                                        /* variant dict */
-                                        var variantDict = JSON.stringify({
-                                            idAnnotation: segment["start"]["properties"]["idVariant"],
-                                            variant: variant,
-                                            number: segment["start"]["properties"]["number"],
-                                            notes: segment["start"]["properties"]["notes"]
-                                        })
-
-                                        /* array of variants */
-                                        if (!variants_arr.includes(variantDict)) {
-                                            variants_arr.push(variantDict);
-                                        };
-
-                                        /* array of attested in relation of variant with witnesses */
-                                        if (segment["relationship"]["type"] == "ATTESTED_IN") {
-                                            var witness_relations = JSON.stringify(segment);
-                                            if (!variant_witnesses_data_arr.includes(witness_relations)) {
-                                                variant_witnesses_data_arr.push(witness_relations);
+                        lemmaVariantWitness_temp.forEach((lv) => {
+                            if (lv !== null) {
+                                if (lv["start"]["labels"] == "Lemma") {
+                                    if (lv["start"]["properties"]["value"] == lemma) {
+                                        lv["segments"].forEach((segment) => {
+                                            if (segment["start"]["labels"] == "Variant") {
+    
+                                                /* variant */
+                                                var variant = segment["start"]["properties"]["value"];
+    
+                                                /* variant dict */
+                                                var variantDict = JSON.stringify({
+                                                    idAnnotation: segment["start"]["properties"]["idVariant"],
+                                                    variant: variant,
+                                                    number: segment["start"]["properties"]["number"],
+                                                    notes: segment["start"]["properties"]["notes"]
+                                                })
+    
+                                                /* array of variants */
+                                                if (!variants_arr.includes(variantDict)) {
+                                                    variants_arr.push(variantDict);
+                                                };
+    
+                                                /* array of attested in relation of variant with witnesses */
+                                                if (segment["relationship"]["type"] == "ATTESTED_IN") {
+                                                    var witness_relations = JSON.stringify(segment);
+                                                    if (!variant_witnesses_data_arr.includes(witness_relations)) {
+                                                        variant_witnesses_data_arr.push(witness_relations);
+                                                    };
+                                                };
+    
                                             };
-                                        };
-
+                                        });
                                     };
-                                });
+                                };
                             };
-                            //};
                         });
 
-                        variants_arr.forEach((el) => {
+                        variants_arr.forEach((v) => {
 
-                            el = JSON.parse(el);
-                            var variant = el["variant"];
-                            var variantDict = el;
+                            v = JSON.parse(v);
+                            var variant = v["variant"];
+                            var variantDict = v;
                             var variant_witnesses_arr = [];
 
                             /* witnesses for each variant */
@@ -611,18 +636,18 @@ router.get("/edit/:id", async (req, res) => {
                     });
                 },
                 onError: err => {
-                    console.log("Error related to the upload to Neo4j: " + err)
+                    console.log(err)
                 }
             })
         );
     } catch (err) {
-        console.log("Error related to Neo4j: " + err);
+        console.log(err);
     } finally {
         await session.close();
     };
 });
 
-router.post("/edit/:id", async (req, res) => {
+router.post(process.env.URL_PATH + "/edit/:id", async (req, res) => {
     const idEdition = req.params.id.split("/").pop().split("-")[0];
     const idEditor = req.params.id.split("/").pop().split("-")[1];
     const session = driver.session();
@@ -631,7 +656,7 @@ router.post("/edit/:id", async (req, res) => {
             await session.writeTransaction(tx => tx
                 .run(
                     `
-                    MATCH (author:Author)<-[:WRITTEN_BY]-(work:Work)-[:HAS_MANIFESTATION]->(edition:Edition)-[:EDITED_BY]->(editor:Editor)
+                    MATCH (author:Author)<-[:WRITTEN_BY]-(work:Work)-[:HAS_MANIFESTATION]->(edition:Edition)<-[:IS_EDITOR_OF]-(editor:Editor)
                     WHERE id(edition) = ${idEdition} AND id(editor) = ${idEditor}
                     MERGE (date:Date)
                     MERGE (edition)-[:PUBLISHED_ON]->(date)
@@ -659,7 +684,7 @@ router.post("/edit/:id", async (req, res) => {
     } catch (err) {
         console.log(err);
     } finally {
-        res.redirect("../edit/" + idEdition + "-" + idEditor);
+        res.redirect(process.env.URL_PATH + "/edit/" + idEdition + "-" + idEditor);
     };
 });
 

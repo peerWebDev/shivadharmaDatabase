@@ -4,7 +4,7 @@ const formidable = require("formidable");
 const bodyParser = require("body-parser");
 const fs = require("fs");
 const neo4j = require("neo4j-driver");
-const driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
+const driver = neo4j.driver(process.env.NEO4J_URL, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
 const router = express.Router();
 router.use(bodyParser.json({ limit: "50mb" }));
 router.use(bodyParser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
@@ -26,7 +26,7 @@ router.post("/saveAsDraft/:id", async (req, res) => {
     } catch (error) {
         console.log(error);
     } finally {
-        res.redirect("../account");
+        res.redirect(process.env.URL_PATH + "/account");
     };
 });
 

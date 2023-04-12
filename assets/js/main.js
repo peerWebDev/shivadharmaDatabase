@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
+    navbarBg();
+    navbarActive();
     alerts();
     popovers();
     tooltips();
@@ -17,6 +19,50 @@ document.addEventListener("DOMContentLoaded", () => {
     witnessDimensions();
     inlineLocation();
 });
+
+/* navbar */
+/* add /remove navbar background */
+let navbarBg = () => {
+    var path = window.location.pathname;
+    var page = path.split("/").pop();
+    if (page == "" || page == "apikey") {
+        document.querySelector(".navbar").classList.remove("navbar-bg");
+    } else {
+        document.querySelector(".navbar").classList.add("navbar-bg");
+    };
+};
+
+/* make navbar li active */
+let navbarActive = () => {
+    var path = window.location.pathname;
+    var page = path.split("/").pop();
+    [].forEach.call(document.querySelectorAll(".navbar-a a"), (el) => {
+        var item = el.getAttribute("href").replace("/", "");
+        if (item == page) {
+            el.classList.add("navbar-a-active");
+        } else {
+            el.classList.remove("navbar-a-active");
+        };
+    });
+};
+
+/* prevent submitting forms by pressing enter */
+let preventEnter = () => {
+    /* remove effect from button */
+    document.getElementById("btn-apikey").classList.remove("heartbeat");
+
+    /* event pressing enter */
+    var form = document.getElementById("form-apikey");
+    form.addEventListener("keypress", (e) => {
+        var key = e.charCode || e.keyCode || 0;
+        if (key == 13) {
+            /* prevent submitting data */
+            e.preventDefault();
+            /* animate the get started button */
+            document.getElementById("btn-apikey").classList.add("heartbeat");
+        };
+    });
+};
 
 /* alerts */
 let alerts = () => {
@@ -91,7 +137,7 @@ let currentTime = () => {
         };
         var currentTimes = document.querySelectorAll(".current-time");
         currentTimes.forEach((el) => {
-            el.innerHTML = '<i class="bi bi-watch"></i> ' + hour + ":" + minutes;
+            el.innerHTML = hour + ":" + minutes;
         });
     };
     time();
@@ -110,6 +156,9 @@ let fileTextarea = () => {
         width: "100%",
         plugins: "preview searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime lists wordcount help charmap quickbars",
         menubar: "file edit view insert format tools table help",
+        menu : {
+            format: {title: "Format", items: "bold italic underline strikethrough | superscript subscript | codeformat | formats blockformats fontsizes align | backcolor | removeformat"},
+        },
         toolbar: "save | undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap | fullscreen preview save | image media template link anchor codesample | ltr rtl",
         toolbar_sticky: false,
         autosave_ask_before_unload: true,
@@ -125,7 +174,7 @@ let fileTextarea = () => {
         quickbars_selection_toolbar: "bold italic | quicklink h2 h3 blockquote quickimage quicktable",
         toolbar_mode: "sliding",
         contextmenu: "link image table",
-        content_style: "body {font-family:Helvetica,Arial,sans-serif; font-size:16px}" +
+        content_style: "body {font-family:'Book Antiqua'; font-size:16px}" +
             "[data-type='milestone'][data-start='start']::before {content: '\u25CF';}" +
             "[data-type='annotation-object'] {display: inline;}" +
             "[data-type='milestone'][data-start='start'][data-subtype='apparatus']::before {content: '\u25CF'; color: #FFC107;}" +
@@ -890,6 +939,9 @@ let annotations = () => {
                                 contentFile: contentFile
                             }
 
+                            /* save the file */
+                            saveFile();
+
                             /* unblock all the buttons */
                             const btns = document.querySelectorAll(".btn-set-annotation button");
                             for (var i = 0; i < btns.length; i++) {
@@ -918,12 +970,18 @@ let annotations = () => {
 /* save file every 5 seconds */
 let saveFile = () => {
     /* fetch data */
-    fetch("http://localhost:8080/saveFile", {
+    fetch("http://localhost:80/saveFile", {
         method: "POST",
         body: JSON.stringify(data),
         headers: { "Content-type": "application/json; charset=UTF-8" }
     })
-        .then(response => response.json())
+        .then((response) => {
+            console.log(response);
+            response.json();
+        })
+        .then(json => {
+            console.log(json);
+        })
         .catch(err => console.log(err));
 
     /* saved message */
@@ -963,7 +1021,7 @@ let metadataTextareas = () => {
 let publishEdition = () => {
     var publishBtn = document.querySelectorAll(".publish-btn");
     for (var i = 0; i < publishBtn.length; i++) {
-        publishBtn[i].addEventListener("click", (e) => {
+        publishBtn[i].addEventListener("click", async (e) => {
 
             var url = window.location.href;
             var idEdition = url.split("/").pop().split("-")[0];
@@ -976,13 +1034,16 @@ let publishEdition = () => {
             }
 
             /* fetch the type of publishment */
-            var route = "http://localhost:8080/publish/" + idEdition + "-" + idEditor;
-            fetch(route, {
+            var route = "http://localhost:80/publish/" + idEdition + "-" + idEditor;
+            await fetch(route, {
                 method: "POST",
                 body: JSON.stringify(publishType),
                 headers: { "Content-type": "application/json; charset=UTF-8" }
             })
                 .then(response => response.json())
+                .then(json => {
+                    console.log(json);
+                })
                 .catch(err => console.log(err));
 
         });

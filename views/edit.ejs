@@ -23,9 +23,11 @@
         <h2 class="d-inline h5 text-secondary">
           <span data-type="header" data-subtype="curated-by">Curated by </span>
           <% if (editors) { %>
+            <span class="after-coma">
             <% editors.forEach((editor) => { %>
-              <span data-type="header" data-subtype="editor"><%= editor %></span>
+              <span class="after-coma-content" data-type="header" data-subtype="editor"><%= editor %></span>
             <% }); %>
+            </span>
           <% }; %>
         </h2>
       </div>
@@ -33,9 +35,9 @@
         <!-- metadata -->
         <%- include ("partials/metadata") %>
         <!-- publish -->
-        <a href="/edition/<%= idEdition %>-<%= idEditor %>" class="btn btn-primary publish-btn" data-value="Published">Publish</a>
+        <a href="<%= process.env.URL_PATH %>/edition/<%= idEdition %>-<%= idEditor %>" class="btn btn-primary publish-btn" data-value="Published">Publish</a>
         <!-- save as draft -->
-        <a href="/edition/<%= idEdition %>-<%= idEditor %>" class="btn btn-light border publish-btn" data-value="Saved as draft">Save as draft</a>
+        <a href="<%= process.env.URL_PATH %>/edition/<%= idEdition %>-<%= idEditor %>" class="btn btn-light border publish-btn" data-value="Saved as draft">Save as draft</a>
       </div>
     </div>
   </div>
@@ -45,13 +47,13 @@
       <!-- textus constitutus -->
       <div class="col-md-6 border p-3 enlarge-col">
         <h3 class="h6">Textus constitutus</h3>
-        <form method="post" action="/addFile/<%= id %>" enctype="multipart/form-data">
-          <label class="text-muted">Upload a <span class="fw-bold">.docx</span> or <span class="fw-bold">.txt</span> file:</label>
-          <input type="file" name="upload">
+        <form method="post" action="<%= process.env.URL_PATH %>/addFile/<%= id %>" enctype="multipart/form-data">
+          <label class="text-muted fs-xs">Upload a <span class="fw-bold">.docx</span> or <span class="fw-bold">.txt</span> file:</label>
+          <input type="file" class="fs-xs" name="upload">
           <input class="btn btn-sm btn-light border" type="submit" value="Submit">
         </form>
         <!-- file -->
-        <form class="file-container" id="base-text" method="post" action="/publish/<%= id %>">
+        <form class="file-container" id="base-text" method="post" action="<%= process.env.URL_PATH %>/publish/<%= id %>">
           <textarea class="mt-1" id="fileBaseTxt" placeholder="Insert the text of your edition..." name="fileBaseTxt">
             <% if (file) { %>
                 <%- include (`../uploads/${file}`) %>
@@ -59,7 +61,7 @@
           </textarea>
           <div class="d-grid gap-2 d-md-flex justify-content-md-end">
             <span class="text-success d-none" id="fragment-message">All changes to the annotated fragment saved.</span>
-            <span class="text-secondary fst-italic d-none" id="autosaved-message">All changes saved.</span>
+            <span class="text-secondary fst-italic fs-xs d-none" id="autosaved-message">All changes saved.</span>
           </div>
         </form>
       </div>
@@ -72,17 +74,17 @@
             <div class="default-settings">
               <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#annotate" type="button" role="tab" aria-controls="annotate" aria-selected="true">Annotate</button>
+                  <button class="nav-link fs-xs active" data-bs-toggle="tab" data-bs-target="#annotate" type="button" role="tab" aria-controls="annotate" aria-selected="true">Annotate</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#check" type="button" role="tab" aria-controls="check" aria-selected="false">Check all</button>
+                  <button class="nav-link fs-xs" data-bs-toggle="tab" data-bs-target="#check" type="button" role="tab" aria-controls="check" aria-selected="false">Check all</button>
                 </li>
               </ul>
               <div class="tab-content scroll-tab">
                 <div class="tab-pane fade show active" id="annotate" role="tabpanel" aria-labelledby="annotate-tab">
                   <!-- default alerts -->
                   <div id="annotation-warning"></div>
-                  <div class="alert alert-primary alert-dismissible fade show mt-3" role="alert">
+                  <div class="alert alert-primary alert-dismissible fade show mt-3 fs-xs" role="alert">
                     <p class="fw-bold">How the annotator works</p>
                     <p class="fw-bolder mb-2">1. Insert the witnesses</p>
                     <p>Click on Add metadata button, then on Witnesses. Insert all the witnesses to use them later building the apparatus. You can modify any metadata later.</p>
@@ -91,8 +93,8 @@
                   </div>
                 </div>
                 <div class="tab-pane fade" id="check" role="tabpanel" aria-labelledby="check-tab">
-                  <h2 class="mt-3 h5" id="check-annotation"></h2>
-                  <div class="alert alert-info alert-dismissible fade show" role="alert">
+                  <h2 class="mt-3 h5 fs-xs" id="check-annotation"></h2>
+                  <div class="alert alert-info alert-dismissible fade show fs-xs" role="alert">
                     <p class="fw-bold">How the annotator works<br><span class="fw-bolder">Check the annotations</span></p>
                     <p>After annotating the selected fragment in the text, click on Check all to check the specific information you added via forms and modify them, if needed.</p>
                   </div>
@@ -248,7 +250,7 @@
   <div class="container-fluid bg-light p-2">
     <div class="row">
       <div class="col-md-12">
-        <span>Insert/check: </span>
+        <span class="fs-xs">Insert/check: </span>
         <!-- text structure -->
         <div class="btn-group btn-set-annotation" role="group">
           <button type="button" class="btn btn-sm btn-preview btn-secondary" data-value="textStructure" title="Preview text structure"><i class="bi bi-eye-fill"></i></button>

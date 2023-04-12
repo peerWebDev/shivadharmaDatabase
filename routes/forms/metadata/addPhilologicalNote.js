@@ -1,16 +1,13 @@
 const express = require("express");
-const path = require("path");
-const formidable = require("formidable");
 const bodyParser = require("body-parser");
-const mammoth = require("mammoth");
 const fs = require("fs");
 const neo4j = require("neo4j-driver");
-const driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
+const driver = neo4j.driver(process.env.NEO4J_URL, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
 const router = express.Router();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: false }));
 
-router.post("/addPhilologicalNote/:id", async (req, res) => {
+router.post(process.env.URL_PATH + "/addPhilologicalNote/:id", async (req, res) => {
     var idEdition = req.params.id.split("/").pop().split("-")[0];
     var idEditor = req.params.id.split("/").pop().split("-")[1];
     var path = `${__dirname}/../../../uploads/philologicalNote/note-${idEdition}-${idEditor}.html`;
@@ -33,7 +30,7 @@ router.post("/addPhilologicalNote/:id", async (req, res) => {
                 await session.writeTransaction(tx => tx
                     .run(
                         `
-                            MATCH (author:Author)<-[:WRITTEN_BY]-(work:Work)-[:HAS_MANIFESTATION]->(edition:Edition)-[:EDITED_BY]->(editor:Editor)
+                            MATCH (author:Author)<-[:WRITTEN_BY]-(work:Work)-[:HAS_MANIFESTATION]->(edition:Edition)<-[:IS_EDITOR_OF]-(editor:Editor)
                             WHERE id(edition) = ${idEdition} AND id(editor) = ${idEditor}
                             MERGE (philologicalNote:PhilologicalNote {name: $philologicalNote})
                             MERGE (philologicalNote)-[:PRODUCED_BY]->(editor)
@@ -43,7 +40,7 @@ router.post("/addPhilologicalNote/:id", async (req, res) => {
                     )
                     .subscribe({
                         onCompleted: () => {
-                            console.log("Data added to the database");
+                            console.log("Philological note added to the database");
                         },
                         onError: err => {
                             console.log(err);
@@ -58,7 +55,7 @@ router.post("/addPhilologicalNote/:id", async (req, res) => {
         } catch (err) {
             console.log(err);
         } finally {
-            res.redirect("/edit/" + idEdition + "-" + idEditor);
+            res.redirect(process.env.URL_PATH + "/edit/" + idEdition + "-" + idEditor);
         };
     };
 });

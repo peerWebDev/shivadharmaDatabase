@@ -8,31 +8,95 @@
   <div class="container-fluid pb-5 pt-5">
     <div class="container">
       <a href="<%= prevUrl; %>" type="button" class="btn btn-sm btn-light border"><i class="bi bi-arrow-left"></i></a>
-      <h1 class="h2 d-inline align-middle">Editions</h1>
+      <h1 class="h2 d-inline align-middle ff-cursive">Editions</h1>
       <!-- alert -->
-      <div class="alert alert-info alert-dismissible fade show" role="alert">
+      <div class="alert alert-info alert-dismissible fade show my-3" role="alert">
         <span>You can edit only the editions of which you are the editor.</span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
-      <!-- list of editions -->
+
+      <% var publishedEditions = []; %>
       <% if (editions.length > 0) { %>
-        <ul>
-          <% editions.forEach(function(edition) { %>
-            <% if (edition.get("edition.publishType") == "Published") { %>
-              <li class="p-2">
-                <span class="fw-bold"><%= edition.get("edition.title"); %></span>, <span><%= edition.get("author.name"); %></span> <span class="text-muted">curated by <%= edition.get("editor.name"); %></span>
-                <a href="/edition/<%= edition.get('ID(edition)') %>-<%= edition.get('ID(editor)') %>" class="btn btn-primary btn-sm" title="Read the edition">Read the edition</a>
-                <% if (edition.get("editor.email") == email) { %>
-                  <a href="/edit/<%= edition.get('ID(edition)') %>-<%= edition.get('ID(editor)') %>" class="btn btn-light btn-sm" title="Edit the edition">Edit the edition</a>
-                <% }; %>
-              </li>
+
+        <!-- published editions -->
+        <% editions.forEach((edition) => { %>
+          <% edition = JSON.parse(edition); %>
+          <% var publish; %>
+          <% for (const [key, value] of Object.entries(edition)) { %>
+            <!-- published edition -->
+            <% if (value["publishType"] == "Published") { %>
+              <!-- published editions array -->
+              <% if (!publishedEditions.includes(edition)) { %>
+                <% publishedEditions.push(edition); %>
+              <% }; %>
             <% }; %>
+          <% }; %>
+        <% }); %>
+
+        <!-- list of editions -->
+        <ul class="marker-list">
+          <% publishedEditions.forEach((edition) => { %>
+
+            <!-- edition -->
+            <li class="p-2">
+
+              <% var file; %>
+              <% var emails = []; %>
+              
+              <% for (const [key, value] of Object.entries(edition)) { %>
+
+                <!-- file -->
+                <% file = value["file"]; %>
+
+                <!-- title -->
+                <% var title = key; %>
+                <span class="fw-bold"><%= title; %></span>
+
+                <!-- authors -->
+                <% var authors = value["authors"]; %>
+                <% authors.forEach((author) => { %>
+                  <span>by</span>
+                  <span><%= author.replace("---", ", "); %></span>
+                <% }); %>
+
+                <!-- editors -->
+                <% var editors = value["editors"]; %>
+                <span class="text-secondary fs-xs">Curated by </span>
+
+                <span class="after-coma">
+                <% editors.forEach((editor) => { %>
+
+                  <% if (editor.split("---")[0] !== "undefined") { %> 
+                    <span class="text-secondary after-coma-content fs-xs"><%= editor.split("---")[0]; %></span>
+                  <% }; %>
+
+                  <!-- editors mails -->
+                  <% if (!emails.includes(editor.split("---")[1])) { %>
+                    <% emails.push(editor.split("---")[1]); %>
+                  <% }; %>
+                <% }); %>
+                </span>
+
+              <% }; %>
+
+              <!-- buttons -->
+              <!-- read the edition -->
+              <a href="/edition/<%= file; %>" class="btn btn-primary btn-sm btn-list" title="Read the edition">Read the edition</a>
+              <!-- edit the edition - edit only if the logged user is the editor -->
+              <% emails.forEach((el) => { %>
+                <% if (el == email) { %>
+                  <a href="/edit/<%= file; %>" class="btn btn-light btn-sm btn-list" title="Edit the edition">Edit the edition</a>
+                <% }; %>
+              <% }); %>
+              
+            </li>
+            
           <% }); %>
         </ul>
       <% } else { %>
-        <div>
+        <div class="my-3">
           <p>No edition is available for now.</p>
-          <a href="/apikey" class="btn btn-primary" title="Read the edition">Create an edition</a>
+          <a href="<%= process.env.URL_PATH %>/apikey" class="btn btn-primary" title="Read the edition">Create an edition</a>
         </div>
       <% }; %>
     </div>

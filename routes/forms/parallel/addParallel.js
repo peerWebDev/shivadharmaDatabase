@@ -1,15 +1,14 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const fs = require("fs");
 const neo4j = require("neo4j-driver");
-const driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
+const driver = neo4j.driver(process.env.NEO4J_URL, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
 const router = express.Router();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: false }));
 const { body, validationResult } = require("express-validator");
 const { render } = require("ejs");
 
-router.post("/addParallel/:id", async (req, res) => {
+router.post(process.env.URL_PATH + "/addParallel/:id", async (req, res) => {
     var idEdition = req.params.id.split("/").pop().split("-")[0];
     var idEditor = req.params.id.split("/").pop().split("-")[1];
     const session = driver.session();
@@ -17,7 +16,7 @@ router.post("/addParallel/:id", async (req, res) => {
         await session.writeTransaction(tx => tx
             .run(
                 `
-                MATCH (edition:Edition)-[:EDITED_BY]->(editor:Editor)
+                MATCH (edition:Edition)<-[:IS_EDITOR_OF]-(editor:Editor)
                 WHERE id(edition) = ${idEdition} AND id(editor) = ${idEditor}
                 MERGE (selectedFragment:SelectedFragment {idAnnotation: "${req.body.idAnnotation}"})
                 ON CREATE
@@ -48,7 +47,7 @@ router.post("/addParallel/:id", async (req, res) => {
             )
             .subscribe({
                 onCompleted: () => {
-                    console.log("Data added to the graph");
+                    console.log("Parallel added to the graph");
                 },
                 onError: err => {
                     console.log(err)
@@ -59,7 +58,7 @@ router.post("/addParallel/:id", async (req, res) => {
         console.log(err);
     } finally {
         await session.close();
-        res.redirect(`../edit/${idEdition}-${idEditor}`);
+        res.redirect(process.env.URL_PATH + `/edit/${idEdition}-${idEditor}`);
     };
 });
 

@@ -1,15 +1,13 @@
 const express = require("express");
-const path = require("path");
-const formidable = require("formidable");
 const bodyParser = require("body-parser");
 const fs = require("fs");
 const neo4j = require("neo4j-driver");
-const driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
+const driver = neo4j.driver(process.env.NEO4J_URL, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
 const router = express.Router();
 router.use(bodyParser.json({ limit: "50mb" }));
 router.use(bodyParser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
 
-router.post("/saveFile", async (req, res) => {
+router.post(process.env.URL_PATH + "/saveFile", async (req, res) => {
     var idEdition = req.body.idEdition;
     var idEditor = req.body.idEditor;
     var contentFile = req.body.contentFile;
@@ -38,7 +36,7 @@ router.post("/saveFile", async (req, res) => {
                     await session.writeTransaction(tx => tx
                         .run(
                             `
-                            MATCH (edition:Edition)-[:EDITED_BY]->(editor:Editor)
+                            MATCH (edition:Edition)<-[:IS_EDITOR_OF]-(editor:Editor)
                             WHERE id(edition) = ${idEdition} AND id(editor) = ${idEditor}
                             MERGE (selectedFragment:SelectedFragment {idAnnotation: "${idFragment}"})
                             ON CREATE
@@ -53,7 +51,7 @@ router.post("/saveFile", async (req, res) => {
                                 console.log("Annotated fragment updated.");
                             },
                             onError: err => {
-                                console.log("Error related to the upload to Neo4j: " + err)
+                                console.log(err)
                             }
                         })
                     );
@@ -63,6 +61,9 @@ router.post("/saveFile", async (req, res) => {
             } finally {
                 await session.close();
             };
+
+            //res.end();
+
         };
     };
 });

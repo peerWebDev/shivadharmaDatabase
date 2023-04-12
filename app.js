@@ -16,7 +16,7 @@ const cookieParser = require("cookie-parser");
 
 /* db */
 const neo4j = require("neo4j-driver");
-const driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
+const driver = neo4j.driver(process.env.NEO4J_URL, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
 
 /* login system */
 const passport = require("passport");
@@ -76,8 +76,15 @@ app.use(methodOverride("_method"));
 /* cookies */
 app.use(cookieParser());
 
+/* cors */
+const cors = require("cors");
+app.use(cors({
+    origin: "*",
+    methods: ["GET","POST","DELETE","UPDATE", "PUT", "PATCH"]
+}));
+
 /* index */
-app.get("/", checkAuthenticated, (req, res) => {
+app.get(process.env.URL_PATH, checkAuthenticated, (req, res) => {
 
     /* store the current url in a cookie */
     var test_url_1 = res.cookie["test_url_1"];
@@ -127,14 +134,17 @@ app.get("/", checkAuthenticated, (req, res) => {
 
 /* login system */
 /* register */
-app.get("/register", checkNotAuthenticated, async (req, res) => {
+app.get(process.env.URL_PATH + "/register", checkNotAuthenticated, async (req, res) => {
     res.render("register");
 });
 
-app.post("/register", checkNotAuthenticated, async (req, res) => {
+app.post(process.env.URL_PATH + "/register", checkNotAuthenticated, async (req, res) => {
     try {
         /* crypt the password */
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+        /* registered users */
+        var registeredUsers = [];
 
         /* insert user in the db */
         const session = driver.session();
@@ -142,12 +152,22 @@ app.post("/register", checkNotAuthenticated, async (req, res) => {
             await session.writeTransaction(tx => tx
                 .run(
                     `
-                    MERGE (editor:Editor {name: "${req.body.name}", email: "${req.body.email}", password: "${hashedPassword}"})
-                    RETURN id(editor), editor.name, editor.email, editor.password
+                    OPTIONAL MATCH (editors:Editor)
+                    MERGE (editor:Editor {email: "${req.body.email}"})
+                    ON CREATE SET editor.name = "${req.body.name}", editor.password = "${hashedPassword}"
+                    RETURN editors, id(editor), editor.name, editor.email, editor.password
                     `
                 )
                 .subscribe({
                     onNext: record => {
+
+                        /* registerd users */
+                        if (record.get("editors") !== null) {
+                            if (!registeredUsers.includes(record.get("editors")["properties"]["email"])) {
+                                registeredUsers.push(record.get("editors")["properties"]["email"]);
+                            };
+                        };
+
                         /* user id */
                         var ids = [];
                         var id;
@@ -157,6 +177,7 @@ app.post("/register", checkNotAuthenticated, async (req, res) => {
                         ids.forEach(el => {
                             id = el["low"];
                         });
+                        
                         /* save the user */
                         users.push({
                             id: id,
@@ -181,12 +202,20 @@ app.post("/register", checkNotAuthenticated, async (req, res) => {
     } catch (err) {
         console.log(err);
     } finally {
-        res.redirect("/login");
+        /* the user with the inserted mail does not exist */
+        if (!registeredUsers.includes(req.body.email)) {
+            res.redirect(process.env.URL_PATH + "/login");
+        } else {
+            /* the user with the inserted mail exist */
+            res.render("register", {
+                errorMessage: "The user with the mail " + req.body.email + " already exists."
+            });
+        };
     };
 });
 
 /* login */
-app.get("/login", checkNotAuthenticated, async (req, res) => {
+app.get(process.env.URL_PATH + "/login", checkNotAuthenticated, async (req, res) => {
     try {
         /* get users from the db */
         const session = driver.session();
@@ -237,11 +266,10 @@ app.get("/login", checkNotAuthenticated, async (req, res) => {
     };
 });
 
-app.post("/login", checkNotAuthenticated,
-
+app.post(process.env.URL_PATH + "/login", checkNotAuthenticated,
     /* if the user is not authenticates, send her to login */
     passport.authenticate("local", {
-        failureRedirect: "/login",
+        failureRedirect: process.env.URL_PATH + "/login",
         failureFlash: true
     }),
 
@@ -249,15 +277,15 @@ app.post("/login", checkNotAuthenticated,
     (req, res) => {
         req.session.user = req.body.email;
         res.cookie("session", req.session, { expire: 500000 + Date.now() });
-        res.redirect("/");
+        res.redirect(process.env.URL_PATH + "/");
     }
 );
 
 /* logout */
-app.delete("/logout", (req, res) => {
+app.delete(process.env.URL_PATH + "/logout", (req, res) => {
     req.logOut((err) => {
         if (err) { return next(err); };
-        res.redirect("login");
+        res.redirect(process.env.URL_PATH + "/login");
     });
 });
 
@@ -285,6 +313,10 @@ app.use("/", addFile);
 const addWitnesses = require("./routes/forms/metadata/addWitnesses");
 app.use("/", addWitnesses);
 
+/* add philological note */
+const addPhilologicalNote  = require("./routes/forms/metadata/addPhilologicalNote");
+app.use("/", addPhilologicalNote);
+
 /* add apparatus */
 const addApparatus = require("./routes/forms/apparatus/addApparatus");
 app.use("/", addApparatus);
@@ -311,11 +343,7 @@ app.use("/", addNote);
 
 /* save file */
 const saveFile = require("./routes/saveFile");
-app.use("/", saveFile);
-
-/* add philological note */
-const addPhilologicalNote  = require("./routes/forms/metadata/addPhilologicalNote");
-app.use("/", addPhilologicalNote);
+app.use("/", saveFile, cors());
 
 /* publish */
 const publish = require("./routes/publish");
@@ -342,19 +370,21 @@ app.use("/", credits, checkAuthenticated);
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
+    } else {
+        res.redirect(process.env.URL_PATH + "/login");
     };
-    res.redirect("/login");
 };
 
 /* do not go back to login if logged users */
 function checkNotAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
-        return res.redirect("/");
+        return res.redirect(process.env.URL_PATH);
+    } else {
+        next();
     };
-    next();
 };
 
-const port = process.env.PORT || 8080;
-app.listen(port, () => console.log(`Shivadharma listening on port localhost:${port}`));
+const port = process.env.PORT || 80;
+app.listen(port, () => console.log(`Shivadharma listening on port localhost:${port}${process.env.URL_PATH}`));
 
 module.exports = app;

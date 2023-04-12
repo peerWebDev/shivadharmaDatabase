@@ -9,7 +9,7 @@
 <!-- metadata modal -->
 <button type="button" class="btn btn-secondary me-3" data-bs-toggle="modal" data-bs-target="#add-metadata">Add metadata</button>
 <!-- metadata modal -->
-<div class="modal fade text-start" id="add-metadata" tabindex="-1" aria-labelledby="add-metadata" aria-hidden="true">
+<div class="modal fade text-start fs-xs" id="add-metadata" tabindex="-1" aria-labelledby="add-metadata" aria-hidden="true">
   <div class="modal-dialog modal-dialog-scrollable modal-fullscreen">
     <div class="modal-content">
       <div class="modal-header">
@@ -33,7 +33,7 @@
 
           <!-- title and responsibility -->
           <div class="tab-pane mb-3 mt-3 fade show active" id="meta-title" role="tabpanel" aria-labelledby="meta-title">
-            <form method="post" action="/edit/<%= id %>">
+            <form method="post" action="<%= process.env.URL_PATH %>/edit/<%= id %>">
               <!-- work -->
               <div class="mb-3">
                 <label class="form-label">Work</label>
@@ -107,7 +107,7 @@
             </div>
 
             <!-- form -->
-            <form id="addWitnesses" method="post" action="/addWitnesses/<%= id %>">
+            <form id="addWitnesses" method="post" action="<%= process.env.URL_PATH %>/addWitnesses/<%= id %>">
               <div class="alert alert-dark alert-dismissible fade show bg-light mb-3 p-3 wit-clone" data-cloned="witness">
                 <!-- siglum -->
                 <div class="mb-3">
@@ -488,7 +488,7 @@
                     </div>
                   </div>-->
                   <!-- bibliography -->
-                  <div class="mb-3">
+                  <div class="metadata-container mb-3">
                     <label class="form-label">Bibliography<sup class="help-symbol" data-bs-toggle="popover" title="Bibliography" data-bs-content="Insert here works and/or catalogues which mention the manuscript."><i class="bi bi-question-lg"></i></sup></label>
                     <div class="textarea-container">
                       <textarea class="mt-1" id="bibliographyEditor0" data-type="witness-metadata" data-subtype="bibliography" name="witnessBibliography0"></textarea>
@@ -496,7 +496,7 @@
                     <div class="form-text">Use the format <b>Author Year: Page.</b> Separate the values by using &#x22; &#x3b; &#x22;.</div>
                   </div>
                   <!-- editions -->
-                  <div class="mb-3">
+                  <div class="metadata-container mb-3">
                     <label class="form-label">Edition&#x28;s&#x29;<sup class="help-symbol" data-bs-toggle="popover" title="Edition&#x28;s&#x29;" data-bs-content="Insert here printed editions based on the manuscript."><i class="bi bi-question-lg"></i></sup></label>
                     <div class="textarea-container">
                       <textarea class="mt-1" id="editionsEditor0" data-type="witness-metadata" data-subtype="editions" name="witnessEditions0"></textarea>
@@ -515,7 +515,7 @@
                     <input type="text" class="form-control" aria-describedby="Siglum in TeX" name="witnessSiglumTex0">
                   </div>
                   <!-- notes -->
-                  <div class="mb-3">
+                  <div class="metadata-container mb-3">
                     <label class="form-label">Notes &#x28;free text&#x29;</label>
                     <div class="textarea-container">
                       <textarea class="metadata-textarea mt-1" id="notesEditor0" data-type="witness-metadata" data-subtype="notes" name="witnessNotes0"></textarea>
@@ -540,7 +540,7 @@
 
           <!-- philological note -->
           <div class="tab-pane mb-3 mt-3 fade" id="meta-philological-note" role="tabpanel" aria-labelledby="meta-title">
-            <form method="post" action="/addPhilologicalNote/<%= id %>">
+            <form method="post" action="<%= process.env.URL_PATH %>/addPhilologicalNote/<%= id %>">
               <div class="metadata-container">
                 <textarea class="mt-1" placeholder="Insert the philological note of your edition..." name="philologicalNote">
                 <% if (philologicalNote) { %>

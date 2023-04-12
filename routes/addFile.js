@@ -5,12 +5,12 @@ const bodyParser = require("body-parser");
 const mammoth = require("mammoth");
 const fs = require("fs");
 const neo4j = require("neo4j-driver");
-const driver = neo4j.driver("bolt://localhost:7687", neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
+const driver = neo4j.driver(process.env.NEO4J_URL, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PW));
 const router = express.Router();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: false }));
 
-router.post("/addFile/:id", async (req, res) => {
+router.post(process.env.URL_PATH + "/addFile/:id", async (req, res) => {
     var idEdition = req.params.id.split("/").pop().split("-")[0];
     var idEditor = req.params.id.split("/").pop().split("-")[1];
 
@@ -55,12 +55,12 @@ router.post("/addFile/:id", async (req, res) => {
                             await session.writeTransaction(tx => tx
                                 .run(
                                     `
-                                        MATCH (author:Author)<-[w:WRITTEN_BY]-(work:Work)-[r:HAS_MANIFESTATION]->(edition:Edition)-[e:EDITED_BY]->(editor:Editor)
+                                        MATCH (author:Author)<-[:WRITTEN_BY]-(work:Work)-[:HAS_MANIFESTATION]->(edition:Edition)<-[:IS_EDITOR_OF]-(editor:Editor)
                                         WHERE id(edition) = ${idEdition} AND id(editor) = ${idEditor}
-                                        OPTIONAL MATCH (edition)-[p:PUBLISHED_ON]->(date:Date)
+                                        OPTIONAL MATCH (edition)-[:PUBLISHED_ON]->(date:Date)
                                         OPTIONAL MATCH (witness:Witness)-[:USED_IN]->(edition)
                                         MERGE (file:File {name: $file})
-                                        MERGE (file)-[pr:PRODUCED_BY]->(editor)
+                                        MERGE (edition)<-[:IS_ITEM_OF]-(file)-[:PRODUCED_BY]->(editor)
                                         RETURN work.title, edition.title, author.name, editor.name, date.on, witness.siglum, file.name
                                         `, { file: fileName }
                                 )
@@ -81,7 +81,7 @@ router.post("/addFile/:id", async (req, res) => {
                     } catch (err) {
                         console.log(err);
                     } finally {
-                        res.redirect("/edit/" + idEdition + "-" + idEditor);
+                        res.redirect(process.env.URL_PATH + "/edit/" + idEdition + "-" + idEditor);
                     };
                 });
         } else {

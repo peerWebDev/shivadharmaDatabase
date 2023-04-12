@@ -18,10 +18,12 @@
             <% }); %>
           </h1>
           <h2 class="d-inline h5 text-secondary">
-            Curated by
-            <% editors.forEach((editor) => { %>
-              <%= editor; %>
-            <% }); %>
+            <span data-type="header" data-subtype="curated-by">Curated by</span>
+            <span class="after-coma">
+              <% editors.forEach((editor) => { %>
+                <span class="after-coma-content" data-type="header" data-subtype="editor"><%= editor; %></span>
+              <% }); %>
+            </span>
           </h2>
         <% }; %>
       </div>
@@ -54,7 +56,7 @@
       <!-- textus constitutus -->
       <div class="col-md-6 border p-3 enlarge-col">
         <% if (file) { %>
-          <%- include (`../uploads/${file}`) %>
+          <div class="ff-edition"><%- include (`../uploads/${file}`) %></div>
         <% } else { %>
           <p>The edition is coming soon!</p>
         <% }; %>
@@ -212,11 +214,11 @@
 
         <!-- apparatus -->
         <% if (apparatus.length > 0) { %>
-          <button type="button" class="btn btn-sm btn-yellow" data-bs-toggle="collapse" href="#collapse-apparatus" role="button" aria-expanded="false" aria-controls="collapse-apparatus">Apparatus</button>
+          <button type="button" class="btn btn-sm btn-yellow caret" data-bs-toggle="collapse" href="#collapse-apparatus" role="button" aria-expanded="false" aria-controls="collapse-apparatus">Apparatus</button>
           <div class="collapse" id="collapse-apparatus">
             <div class="card card-body">
               <% apparatus.forEach((entry) => { %>
-                <div data-type="apparatus" data-subtype="entry">
+                <div class="fs-xs" data-type="apparatus" data-subtype="entry">
                   <% entry.forEach((el) => { %>
 
                     <!-- location -->
@@ -258,11 +260,11 @@
 
         <!-- notes -->
         <% if (notes.length > 0) { %>
-          <button type="button" class="btn btn-sm btn-blue" data-bs-toggle="collapse" href="#collapse-notes" role="button" aria-expanded="false" aria-controls="collapse-notes">Notes</button>
+          <button type="button" class="btn btn-sm btn-blue caret" data-bs-toggle="collapse" href="#collapse-notes" role="button" aria-expanded="false" aria-controls="collapse-notes">Notes</button>
           <div class="collapse" id="collapse-notes">
             <div class="card card-body">
               <% notes.forEach((el) => { %>
-                <div data-type="note" data-subtype="note">
+                <div class="fs-xs" data-type="note" data-subtype="note">
                   <span class="me-1" data-type="location" data-subtype="location-top">
                     <span data-type="note" data-subtype="stanzaStart"><%= el["stanzaStart"]; %></span><span data-type="note" data-subtype="padaStart"><%= el["padaStart"].replace(/,|a\,b\,c\,d\,e\,f|a\,b\,c\,d/g, ""); %></span>
                   </span>
